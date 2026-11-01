@@ -99,6 +99,17 @@ from cutvoke.interfaces.local_models import tool_specs as _local_model_tools
 AGENT_TOOLS.extend(_local_model_tools())
 
 
+def project_listing(service, arguments):
+    """Read the library without initializing optional media/render services."""
+    store = service.store
+    items = store.list_projects() if store else [
+        {"id": p.project_id, "name": p.name, "revision": p.revision}
+        for p in service._projects.values()]
+    query = arguments.get('query', '').casefold()
+    return AgentTools._page([p for p in items if query in
+                            (p['name'] + ' ' + p['id']).casefold()], arguments, 'projects')
+
+
 class AgentTools:
     def __init__(self, api):
         self.api = api
@@ -162,12 +173,7 @@ class AgentTools:
                 "nextOffset": offset + limit if offset + limit < len(items) else None}
 
     def project_list(self, a):
-        store = self.service.store
-        items = store.list_projects() if store else [
-            {"id": p.project_id, "name": p.name, "revision": p.revision}
-            for p in self.service._projects.values()]
-        query = a.get("query", "").casefold()
-        return self._page([p for p in items if query in (p["name"] + " " + p["id"]).casefold()], a, "projects")
+        return project_listing(self.service, a)
 
     def project_clone(self, a):
         project = self._project(a)

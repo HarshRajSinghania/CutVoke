@@ -198,6 +198,10 @@ cutvoke serve --data .artifacts/first-edit/data
 
 Use a new output directory for each demo. Open `http://127.0.0.1:8787` and select the demo project. The MCP process, HTTP service and desktop must all use the same data directory. `--data` takes precedence over `CUTVOKE_DATA`; the CLI default is `~/.cutvoke/data`. No HOME override or special filesystem permission is needed when a writable `--data` directory is provided.
 
+For a source MCP-only installation, the Web build and Node.js are optional. Run `python -m cutvoke doctor --mcp-only --json`; default `doctor` continues to require the browser editor. `runtime.webDirectory:null` is expected without a Web build. Wheels and desktop distributions still require their bundled Web assets. Prefer an absolute virtual-environment Python command with `-m cutvoke mcp --data <absolute-directory>` for source clients; the supported console launchers remain valid.
+
+The default RenderService and `doctor` validate FFmpeg/ffprobe candidates in PATH order. Empty files, launch failures and failed version checks are reported as `rejectedCandidates`; a later working binary may be selected. Explicit RenderService paths remain fixed and never fall back. Project listing does not initialize optional media assets. File/PATH changes invalidate discovery; transient failures with unchanged files retry after three seconds. Independent audio/model utilities can still use PATH directly: correct the launching process's PATH and restart when broken shims are present. Discovery does not delete or repair those files.
+
 ## Tested environments and limits
 
 | Environment | Evidence and scope |

@@ -58,8 +58,9 @@ def test_edit_error_retains_revision_recovery_flags_and_command_contract():
     assert 'retryable' in response['error'] and 'committed' in response['error']
 
 
-def test_doctor_fails_when_required_executables_are_missing():
-    with patch('cutvoke.runtime.shutil.which', return_value=None):
+def test_doctor_fails_when_required_executables_are_missing(tmp_path, monkeypatch):
+    monkeypatch.setenv('PATH', str(tmp_path))
+    with patch('cutvoke.runtime.web_directory', return_value=tmp_path):
         report = runtime.diagnose_environment()
     assert report['ok'] is False
     missing = {check['name'] for check in report['checks'] if not check['ok']}
@@ -136,3 +137,49 @@ def test_frozen_identity_survives_relocation_and_tracks_web_changes(tmp_path, mo
     assert runtime.source_fingerprint() == original
     index.write_text('updated editor', encoding='utf-8')
     assert runtime.source_fingerprint() != original
+
+
+def test_mcp_only_profile_does_not_require_web_but_default_still_does():
+    with patch('cutvoke.runtime.web_directory', return_value=None):
+        full = runtime.diagnose_environment()
+        mcp = runtime.diagnose_environment(mcp_only=True)
+    web = next(check for check in full['checks'] if check['name'] == 'web-editor')
+    mcp_web = next(check for check in mcp['checks'] if check['name'] == 'web-editor')
+    assert not full['ok'] and web['required'] and not web['ok']
+    assert not mcp_web['required'] and not mcp_web['ok']
+    assert mcp['ok'] == all(check['ok'] for check in mcp['checks'] if check['required'])
+    assert mcp['profile'] == 'mcp-only' and full['profile'] == 'editor'
+
+
+def test_doctor_mcp_only_cli_option_is_forwarded(capsys):
+    from cutvoke.interfaces.cli import main
+    with patch('cutvoke.runtime.diagnose_environment', return_value={'ok': True, 'profile': 'mcp-only'}) as diagnose:
+        assert main(['doctor', '--mcp-only', '--json']) == 0
+    diagnose.assert_called_once_with(mcp_only=True)
+    assert json.loads(capsys.readouterr().out)['profile'] == 'mcp-only'
+
+
+def test_doctor_uses_valid_tools_after_shadow_and_explains_selection(tmp_path, monkeypatch):
+    import os
+    import shutil
+    import pytest
+    if os.name == 'nt':
+        pytest.skip('POSIX symlink fixture; launch failures covered deterministically')
+    real = {name: shutil.which(name) for name in ('ffmpeg', 'ffprobe')}
+    if not all(real.values()):
+        pytest.skip('FFmpeg required')
+    shadow = tmp_path / 'shadow'
+    good = tmp_path / 'good'
+    shadow.mkdir()
+    good.mkdir()
+    for name, target in real.items():
+        (shadow / name).touch()
+        (shadow / name).chmod(0o755)
+        (good / name).symlink_to(target)
+    monkeypatch.setenv('PATH', os.pathsep.join([str(shadow), str(good)]))
+    report = runtime.diagnose_environment(mcp_only=True)
+    for name in real:
+        check = next(check for check in report['checks'] if check['name'] == name)
+        assert check['ok'] and check['path'] == str(good / name)
+        assert check['rejectedCandidates'] == [{'path': str(shadow / name), 'message': 'empty executable'}]
+        assert report[name] == check['path']

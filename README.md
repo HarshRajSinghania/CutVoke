@@ -239,6 +239,8 @@ MCP includes `editor_help` for current commands, units, recipes and recovery, pl
 
 The standard MCP launcher automatically activates healthy engine updates while keeping the connection and existing render jobs. See [automatic update behavior and limits](docs/production-workflow.md#runtime-changes--服务版本变化); previously running launchers need one initial reconnect.
 
+Source MCP-only installs can use `python -m cutvoke doctor --mcp-only --json` without building the browser editor. Start discovery with `editor_help`, then `commands_list`/`effects_list` for the needed items; `capabilities` returns a large complete snapshot. See [installation diagnostics](docs/user/installation.md).
+
 **Use it:** copy the complete `skills/cutvoke-editor/` folder into your AI tool's skill directory, or let a tool that accepts Markdown instructions read `SKILL.md`. [The installation and usage guide](docs/user/agent-skill.md) includes concrete Codex copy commands and the verified scope. Keep `references/` and `scripts/` with the entry point.
 
 After connecting, try a request such as:
