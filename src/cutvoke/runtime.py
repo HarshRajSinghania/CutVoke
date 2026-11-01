@@ -7,7 +7,6 @@ import json
 import os
 from pathlib import Path
 import platform
-import shutil
 import subprocess
 import sys
 import threading
@@ -109,23 +108,16 @@ def runtime_identity(data_path: str | None = None) -> dict:
     return result
 
 
-def diagnose_environment() -> dict:
+def diagnose_environment(*, mcp_only: bool = False) -> dict:
+    from cutvoke.rendering.media_executable import media_tool_status
     checks = []
     for name in ('ffmpeg', 'ffprobe'):
-        executable = shutil.which(name)
-        check = {'name': name, 'required': True, 'ok': False, 'path': executable}
-        if executable:
-            try:
-                completed = subprocess.run([executable, '-version'], capture_output=True,
-                                           text=True, errors='replace', timeout=10)
-                check.update(ok=completed.returncode == 0,
-                             version=(completed.stdout or completed.stderr).splitlines()[0])
-            except (OSError, subprocess.TimeoutExpired, IndexError) as exc:
-                check['message'] = str(exc)
-        else:
-            check['message'] = f'Install {name} and add its bin directory to PATH.'
+        status = media_tool_status(name)
+        check = {'name': name, 'required': True, 'ok': status['path'] is not None, **status}
+        if not check['ok']:
+            check['message'] = f'Install a working {name} and add its bin directory to PATH.'
         checks.append(check)
-    ffmpeg = shutil.which('ffmpeg')
+    ffmpeg = checks[0]['path']
     if ffmpeg and checks[0]['ok']:
         for option, required_names in (('-encoders', ('libx264', 'aac')),
                                        ('-filters', ('overlay', 'drawtext', 'subtitles'))):
@@ -145,9 +137,9 @@ def diagnose_environment() -> dict:
     checks.append({'name': 'fontTools', 'required': True,
                    'ok': importlib.util.find_spec('fontTools') is not None,
                    'message': 'Required for matching caption font weights in preview and export.'})
-    checks.append({'name': 'web-editor', 'required': True,
+    checks.append({'name': 'web-editor', 'required': not mcp_only,
                    'ok': web_directory() is not None,
-                   'message': 'For a source checkout, run npm ci and npm run build in apps/editor.'})
+                   'message': 'Required for the browser editor; optional for MCP-only use. For a source checkout, run npm ci and npm run build in apps/editor.'})
     package = Path(__file__).resolve().parent
     for relative in ('catalogs/builtin_presets.json', 'catalogs/builtin_stickers.json',
                      'catalogs/builtin_resource_pack.json'):
@@ -156,7 +148,8 @@ def diagnose_environment() -> dict:
     return {
         'ok': all(check['ok'] for check in checks if check['required']),
         'platform': platform.platform(), 'python': platform.python_version(),
-        'ffmpeg': ffmpeg, 'ffprobe': shutil.which('ffprobe'), 'checks': checks,
+        'ffmpeg': ffmpeg, 'ffprobe': checks[1]['path'], 'checks': checks,
+        'profile': 'mcp-only' if mcp_only else 'editor',
         'runtime': runtime_identity(),
         'optionalDependencies': {name: importlib.util.find_spec(module) is not None
                                  for name, module in (('asr', 'faster_whisper'),

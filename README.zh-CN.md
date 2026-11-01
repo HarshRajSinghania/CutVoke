@@ -239,6 +239,8 @@ MCP 自带 `editor_help`，支持当前命令、单位、范例与恢复；`topi
 
 标准 MCP 启动入口会自动切换到通过检查的新引擎，保持连接和已提交的渲染任务。详见[自动更新行为与边界](docs/production-workflow.md#runtime-changes--服务版本变化)；之前已经运行的旧启动器首次接入时需要重连一次。
 
+源码版仅使用 MCP 时，可运行 `python -m cutvoke doctor --mcp-only --json`，无需构建浏览器编辑器。能力发现先用 `editor_help`，再用 `commands_list` / `effects_list` 查询所需条目；`capabilities` 返回较大的完整快照。详见[安装诊断](docs/user/installation.md)。
+
 **使用方式**：将整个 `skills/cutvoke-editor/` 复制到 AI 工具的技能目录，或让支持 Markdown 指令的工具读取 `SKILL.md`；Codex 的具体复制命令及已验证范围见 [中文安装与使用说明](docs/user/agent-skill.zh-CN.md)。保留其 `references/` 与 `scripts/`，避免相对引用失效。
 
 连接后可以这样给任务：

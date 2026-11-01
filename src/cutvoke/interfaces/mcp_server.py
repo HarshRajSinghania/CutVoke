@@ -178,7 +178,7 @@ class MCPServer:
             },
             {
                 "name": "command_preview",
-                "description": "先查询 capabilities.commands 中该命令的 previewSupported；只有 true 才可预演。在当前 revision 上试算编辑，不写工程、不占 revision、不渲染。导出、音频处理、任务创建或取消等外部副作用命令会被拒绝，应明确使用 command_apply。",
+                "description": "先用 commands_list(type=目标命令) 查询 previewSupported；只有 true 才可预演。在当前 revision 上试算编辑，不写工程、不占 revision、不渲染。导出、音频处理、任务创建或取消等外部副作用命令会被拒绝，应明确使用 command_apply。",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
@@ -246,7 +246,7 @@ class MCPServer:
             },
             {
                 "name": "capabilities",
-                "description": "查询当前支持的编辑能力（命令类型、效果清单、质量预设等）。",
+                "description": "完整能力快照，可能很大。首次接入用 editor_help；命令用 commands_list 按名称/分页查询，效果用 effects_list。仅需完整清单时调用本工具。",
                 "inputSchema": {"type": "object", "properties": {}},
             },
         ]
@@ -346,6 +346,9 @@ class MCPServer:
             self._validate_arguments(arguments, tool["inputSchema"])
             if name == "editor_help":
                 return {"ok": True, "help": EditorGuide(self.service).help(arguments)}
+            if name == 'project_list':
+                from cutvoke.interfaces.agent_tools import project_listing
+                return {'ok': True, **project_listing(self.service, arguments)}
             from cutvoke.interfaces.agent_tools import AGENT_TOOLS
             if any(tool["name"] == name for tool in AGENT_TOOLS):
                 return self._agent_tools().call(name, arguments)

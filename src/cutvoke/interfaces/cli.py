@@ -166,7 +166,7 @@ def cmd_serve(args) -> int:
 def cmd_doctor(args) -> int:
     """环境诊断。"""
     from cutvoke.runtime import diagnose_environment
-    info = diagnose_environment()
+    info = diagnose_environment(mcp_only=getattr(args, 'mcp_only', False))
     if getattr(args, 'json', False):
         _json_out(info)
     else:
@@ -717,6 +717,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_serve.set_defaults(func=cmd_serve)
 
     p_doctor = sub.add_parser("doctor", help="diagnose environment")
+    p_doctor.add_argument('--mcp-only', action='store_true', help='do not require browser editor assets')
     # 不再单独定义 --json：顶层开关已覆盖，且重复定义会覆盖顶层的解析结果。
     p_doctor.set_defaults(func=cmd_doctor)
 

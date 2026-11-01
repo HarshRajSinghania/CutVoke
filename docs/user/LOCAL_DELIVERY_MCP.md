@@ -40,6 +40,10 @@ $env:CUTVOKE_NO_BROWSER = "1"
 
 缺少必要依赖时 `doctor` 返回 `ok:false` 和非零退出码。语音识别与人物模型属于单独安装组件，诊断结果中的 `optionalDependencies` 表示 Python 组件是否安装，不表示模型已下载。
 
+仅使用源码版 MCP 时，不需要构建浏览器编辑器。用 `python -m cutvoke doctor --mcp-only --json` 检查这种安装；默认 `doctor` 仍要求 Web 产物。`runtime.webDirectory:null` 表示未找到已构建网页，不表示 MCP 连接失败。需要浏览器界面时再在 `apps/editor` 执行 `npm ci` 和 `npm run build`。
+
+默认 RenderService 与 `doctor` 按 PATH 顺序验证 FFmpeg/ffprobe，跳过空文件、无法启动或版本检查失败的候选；诊断中的 `rejectedCandidates` 保留路径和原因。显式传给 RenderService 的路径固定使用，不自动换成另一程序。缺少有效工具时媒体操作报错，但 `project_list` 仍可列举工程。修复文件或 PATH 后会重新检查；未变更文件的临时启动故障最多缓存三秒。其他独立音频/模型工具仍可能直接使用 PATH，遇到损坏占位应修正启动进程的 PATH 并重启，不能据此认为机器上的坏文件已被删除或所有功能都已恢复。
+
 字幕渲染需要随 Python 包安装的 `fontTools`。首次使用某个字体和字重时，会从随包变量字体生成正确的 400/700 字重并原子缓存到系统临时目录 `cutvoke-caption-fonts`；后续导出复用缓存。可设置 `CUTVOKE_FONT_CACHE` 使用专用缓存目录。浏览器预览通过只读白名单 `/api/v1/fonts/NotoSansSC-VF.ttf` 和 `/api/v1/fonts/NotoSerifSC-VF.ttf` 加载同一字体来源。标题片段保留原有 ASS 渲染规则。
 
 `GET /api/v1/runtime` 返回启动时固定的 `sourceFingerprint`、`processId`、`dataPath`、`dataDirectory`、`pythonExecutable` 和 `webDirectory`；同一身份附在 `capabilities.runtime`。磁盘源码变动不会改变旧进程报告的指纹。
@@ -64,9 +68,9 @@ MCP 与 Web 要共同编辑同一个工程，必须指向同一 `--data` 目录�
 
 ## 智能体操作顺序
 
-1. 用 `runtime` 确认版本与数据目录，用 `capabilities` 查询当前命令和参数。
+1. 用 `runtime` 确认版本与数据目录，先读 `editor_help({})`。用 `commands_list(type=目标命令)` 或 `query/offset/limit` 按需查询命令；效果用 `effects_list`。`capabilities` 保留完整快照，可能超过客户端输出上限，不必每次全量拉取。
 2. 使用 `project_summary` / `project_lookup` 获取当前 revision 与目标对象；需要完整内容时使用 `project_query`。
-3. 先检查 `capabilities.commands` 中目标命令的 `previewSupported`；为 true 时可用 `command_preview` 预演。导出、音频处理、创建或取消任务等外部副作用命令不能预演，应明确提交 `command_apply`。编辑多个对象前使用 `edit_lock` 获取租约。
+3. 先检查 `commands_list` 返回的目标命令的 `previewSupported`；为 true 时可用 `command_preview` 预演。导出、音频处理、创建或取消任务等外部副作用命令不能预演，应明确提交 `command_apply`。编辑多个对象前使用 `edit_lock` 获取租约。
 4. `command_apply` 带上当前 `expectedRevision`、租约和可复用的 `commandId`。时间使用 `{ "num": "1", "den": "2" }`。
 5. 每次成功编辑已事务保存到 SQLite。关闭、重新连接后可查询重开的工程，并通过 `history.undo` 撤销已保存编辑。
 6. 释放租约；先用 `command_apply` 调用只读命令 `project.preflight`（`payload={}`，也可指定导出区间），读取 `changedEntities[0].report.readyToRender`。若为 false，根据 `errors` 定位缺失素材或 LUT、恢复后重新检查。它不会新增编辑 revision 或撤销点。

@@ -53,8 +53,8 @@ from cutvoke.rendering import gpu_effects
 from cutvoke.rendering.gpu_effects import acceleration_enabled
 from cutvoke.rendering.render_memo import RenderMemo, file_identity
 
-# subprocess resolves these names through PATH. Deployments that need a fixed
-# binary can pass an explicit path to RenderService.
+# Default names use validated PATH discovery when first used. Deployments that
+# need a fixed binary can pass an explicit path to RenderService.
 DEFAULT_FFMPEG = "ffmpeg"
 DEFAULT_FFPROBE = "ffprobe"
 
@@ -1355,6 +1355,24 @@ def _prepare_static_masks(method):
 
 
 class RenderService:
+    @property
+    def ffmpeg(self):
+        from cutvoke.rendering.media_executable import resolve_media_tool
+        return resolve_media_tool('ffmpeg') if self._ffmpeg == DEFAULT_FFMPEG else self._ffmpeg
+
+    @ffmpeg.setter
+    def ffmpeg(self, value):
+        self._ffmpeg = value
+
+    @property
+    def ffprobe(self):
+        from cutvoke.rendering.media_executable import resolve_media_tool
+        return resolve_media_tool('ffprobe') if self._ffprobe == DEFAULT_FFPROBE else self._ffprobe
+
+    @ffprobe.setter
+    def ffprobe(self, value):
+        self._ffprobe = value
+
     def __init__(self, ffmpeg_path: str = DEFAULT_FFMPEG,
                  ffprobe_path: str = DEFAULT_FFPROBE,
                  registry: Optional[EffectRegistry] = None,
@@ -5587,7 +5605,10 @@ class RenderService:
         """Probe current source metadata once, sharing concurrent reads safely."""
         if not os.path.isfile(src):
             raise RenderError(f"media file not found: {src!r}")
-        identity = (self.ffprobe, file_identity(src))
+        try:
+            identity = (self.ffprobe, file_identity(src))
+        except OSError as error:
+            raise RenderError(f'ffprobe unavailable: {error}') from error
         return dict(self._probe_cache.get_or_compute(
             identity, lambda: self._probe_media_uncached(src, timeout)))
 
@@ -5602,8 +5623,12 @@ class RenderService:
         import os as _os
         if not _os.path.isfile(src):
             raise RenderError(f"media file not found: {src!r}")
+        try:
+            executable = self.ffprobe
+        except OSError as e:
+            raise RenderError(f'ffprobe unavailable: {e}') from e
         cmd = [
-            self.ffprobe, "-v", "error",
+            executable, "-v", "error",
             "-show_entries", "format=duration,format_name",
             "-show_entries", "stream=codec_type,width,height,pix_fmt,duration,start_time,avg_frame_rate,r_frame_rate",
             "-of", "json", src,
@@ -5614,6 +5639,8 @@ class RenderService:
                                timeout=timeout)
         except subprocess.TimeoutExpired as e:
             raise RenderError(f"probe timed out on {src!r}") from e
+        except OSError as e:
+            raise RenderError(f"ffprobe could not start ({cmd[0]!r}): {e}") from e
         if r.returncode != 0:
             raise RenderError(f"ffprobe failed on {src!r}: {r.stderr[-400:]}")
         try:
