@@ -146,3 +146,30 @@ def test_real_ffmpeg_after_empty_shadow_produces_audio(tmp_path, monkeypatch):
                    check=True, capture_output=True, timeout=10)
     info = renderer.probe_media(str(output))
     assert info['has_audio'] and info['duration'] == pytest.approx(.2)
+
+
+@pytest.mark.skipif(os.name != 'nt', reason='requires real Windows CreateProcess')
+@pytest.mark.parametrize('content', [b'', b'MZ-invalid-PE-image'])
+def test_real_windows_invalid_exes_and_explicit_failure(tmp_path, monkeypatch, content):
+    import wave
+    real = {name: shutil.which(name) for name in ('ffmpeg', 'ffprobe')}
+    assert all(real.values()), 'native acceptance must provide FFmpeg and ffprobe'
+    shadow = tmp_path / 'shadow'
+    bad = {name: candidate(shadow, name=name, content=content) for name in real}
+    monkeypatch.setenv('PATH', str(shadow) + os.pathsep + os.environ['PATH'])
+    for name in real:
+        status = tools.media_tool_status(name)
+        assert os.path.normcase(status['path']) == os.path.normcase(real[name])
+        assert status['rejectedCandidates'][0]['path'] == str(bad[name])
+        message = status['rejectedCandidates'][0]['message']
+        assert ('WinError 193' in message) if content else message == 'empty executable'
+    source = tmp_path / 'source.wav'
+    with wave.open(str(source), 'wb') as stream:
+        stream.setnchannels(1)
+        stream.setsampwidth(2)
+        stream.setframerate(8000)
+        stream.writeframes(b'\0\0' * 800)
+    assert RenderService().probe_media(str(source))['duration'] == pytest.approx(.1)
+    if content:
+        with pytest.raises(RenderError, match='ffprobe could not start.*WinError 193'):
+            RenderService(ffprobe_path=str(bad['ffprobe'])).probe_media(str(source))
