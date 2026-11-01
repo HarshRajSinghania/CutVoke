@@ -162,7 +162,11 @@ def test_real_windows_invalid_exes_and_explicit_failure(tmp_path, monkeypatch, c
         assert os.path.normcase(status['path']) == os.path.normcase(real[name])
         assert status['rejectedCandidates'][0]['path'] == str(bad[name])
         message = status['rejectedCandidates'][0]['message']
-        assert (('WinError 193' in message) if content else message == 'empty executable'), message
+        # Windows versions classify malformed images as bad format (193) or
+        # machine mismatch (216). Both must preserve later valid candidates;
+        # the exact 193 branch also has deterministic coverage above.
+        assert (any(code in message for code in ('WinError 193', 'WinError 216'))
+                if content else message == 'empty executable'), message
     source = tmp_path / 'source.wav'
     with wave.open(str(source), 'wb') as stream:
         stream.setnchannels(1)
@@ -171,5 +175,5 @@ def test_real_windows_invalid_exes_and_explicit_failure(tmp_path, monkeypatch, c
         stream.writeframes(b'\0\0' * 800)
     assert RenderService().probe_media(str(source))['duration'] == pytest.approx(.1)
     if content:
-        with pytest.raises(RenderError, match='ffprobe could not start.*WinError 193'):
+        with pytest.raises(RenderError, match=r'ffprobe could not start.*WinError (193|216)'):
             RenderService(ffprobe_path=str(bad['ffprobe'])).probe_media(str(source))
