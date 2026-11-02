@@ -154,11 +154,11 @@ export function usePreviewFrame(opts: {
       // 必须按真实时间推进播放头；拉帧节流只影响刷新频率，不应改变时长。
       const next = playheadRef.current + dt;
       if (next >= totalSecs) {
-        dispatchRef.current({ type: "PLAYHEAD_SET", t: totalSecs });
+        dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: totalSecs });
         onEnded();
         return;
       }
-      dispatchRef.current({ type: "PLAYHEAD_SET", t: next });
+      dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: next });
       scheduleFrame(next);
       rafRef.current = requestAnimationFrame(tick);
     };

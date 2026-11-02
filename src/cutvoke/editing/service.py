@@ -1351,35 +1351,42 @@ class EditService:
         },
     }
 
-    def command_catalog(self, lang: str = "zh-CN") -> list[dict]:
+    def command_catalog(self, lang: str = "zh-CN", *, include_schemas: bool = True) -> list[dict]:
         """命令目录：自动派生自 self._handlers（单一事实来源，杜绝硬编码漂移）。
 
         返回按命令名排序的列表，每项：
             {"type", "description", "params": [{"name","description","required"}]}。
         出现在 _handlers 但不在 COMMAND_PARAM_SPECS 的命令，描述回退为 "(未描述)"。
+        include_schemas=False 省略 params/inputSchema；其他目录元数据保持不变。
         """
+        if not isinstance(include_schemas, bool):
+            raise ValueError("includeSchemas must be boolean")
         from cutvoke.editing.command_schema import payload_schema
-        try:
-            text_schema = self._effects.get("cutvoke.text").to_dict()["parameters"]
-        except EffectNotFound:
-            text_schema = {"type": "object", "properties": {"content": {"type": "string"}}}
+        if include_schemas:
+            try:
+                text_schema = self._effects.get("cutvoke.text").to_dict()["parameters"]
+            except EffectNotFound:
+                text_schema = {"type": "object", "properties": {"content": {"type": "string"}}}
         catalog: list[dict] = []
         for cmd in sorted(self._handlers.keys()):
             spec = self.COMMAND_PARAM_SPECS.get(cmd)
             if spec is None:
-                catalog.append({"type": cmd, "description": "(未描述)", "params": []})
+                catalog.append({"type": cmd, "description": "(未描述)",
+                                **({"params": []} if include_schemas else {})})
             else:
                 entry = {
                     "type": cmd,
                     "description": spec.get("description", "(未描述)"),
-                    "params": [dict(p) for p in spec.get("params", [])],
+                    **({"params": [dict(p) for p in spec.get("params", [])]}
+                       if include_schemas else {}),
                     "previewSupported": (cmd not in _NONMUTATING_COMMANDS
                                          or cmd in _PREVIEWABLE_READONLY_COMMANDS),
                 }
                 if cmd == "edit.batch":
                     entry["allowedCommands"] = sorted(_BATCH_EDIT_COMMANDS)
                     entry["maxCommands"] = _BATCH_MAX_COMMANDS
-                entry["inputSchema"] = payload_schema(cmd, entry["params"], {"cutvoke.text": text_schema})
+                if include_schemas:
+                    entry["inputSchema"] = payload_schema(cmd, entry["params"], {"cutvoke.text": text_schema})
                 catalog.append(entry)
         return catalog
 

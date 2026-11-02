@@ -109,6 +109,8 @@ flowchart LR
 
 时间线支持多轨素材、文字与字幕、片段调整、音量与淡入淡出、关键帧及现有转场/效果。编辑可预演、撤销/重做；Agent 成组修改时通过租约避免与人工写入冲突。连续预览按时间窗准备并复用缓存，导出绑定提交时的工程版本。
 
+语音剪辑可先搜索转写文本，定位或试听句子、单词范围，再预览删除影响并明确确认。剪辑同步收拢画面、声音和字幕，可一次撤销；普通字幕改字只修改字幕。详见[按文本剪视频](docs/user/ADVANCED_TIMELINE.md)。
+
 最新源码版的[制作工作流](docs/production-workflow.md)还支持纯文字标题卡、绑定图层整组复用、按需预览和制作归档。
 
 ![CutVoke 简体中文字幕编辑：选中文字与 0–4 秒起止时间，并在真实预览中检查](docs/images/readme/zh-CN/caption-editing.png)
@@ -239,7 +241,7 @@ MCP 自带 `editor_help`，支持当前命令、单位、范例与恢复；`topi
 
 标准 MCP 启动入口会自动切换到通过检查的新引擎，保持连接和已提交的渲染任务。详见[自动更新行为与边界](docs/production-workflow.md#runtime-changes--服务版本变化)；之前已经运行的旧启动器首次接入时需要重连一次。
 
-源码版仅使用 MCP 时，可运行 `python -m cutvoke doctor --mcp-only --json`，无需构建浏览器编辑器。能力发现先用 `editor_help`，再用 `commands_list` / `effects_list` 查询所需条目；`capabilities` 返回较大的完整快照。详见[安装诊断](docs/user/installation.md)。
+源码版仅使用 MCP 时，可运行 `python -m cutvoke doctor --mcp-only --json`，无需构建浏览器编辑器。能力发现先用 `editor_help`，再用 `commands_list(includeSchemas=false)` 搜索轻量命令索引，用 `editor_help(topic="command", command="…")` 获取选定命令的 payload schema。效果查询使用 `effects_list`；`capabilities` 返回较大的完整快照。详见[安装诊断](docs/user/installation.md)。
 
 **使用方式**：将整个 `skills/cutvoke-editor/` 复制到 AI 工具的技能目录，或让支持 Markdown 指令的工具读取 `SKILL.md`；Codex 的具体复制命令及已验证范围见 [中文安装与使用说明](docs/user/agent-skill.zh-CN.md)。保留其 `references/` 与 `scripts/`，避免相对引用失效。
 

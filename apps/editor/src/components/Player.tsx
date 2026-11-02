@@ -28,6 +28,8 @@ import { usePreviewPoster } from "./usePreviewPoster";
 import { useVideoHandoff } from "./useVideoHandoff";
 import { usePreviewSegments } from "./usePreviewSegments";
 import { usePreviewPreload } from "./usePreviewPreload";
+import { useTranscriptAudition } from "./useTranscriptAudition";
+import { CANCEL_AUDITION_EVENT } from "../lib/transcript";
 import { PreviewVideoPool } from "./PreviewVideoPool";
 import { getEffectCatalog } from "../lib/effects";
 import { fetchPreviewFrame } from "../lib/mediaApi";
@@ -449,11 +451,11 @@ export function Player() {
     if (audioTransportRef.current.active && playingRef.current) return;
     if (windowEnd < mediaEndSecs - 0.01) {
       setVideoTime(windowEnd);
-      dispatchRef.current({ type: "PLAYHEAD_SET", t: windowEnd });
+      dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: windowEnd });
       return;
     }
     setVideoTime(mediaEndSecs);
-    dispatchRef.current({ type: "PLAYHEAD_SET", t: mediaEndSecs });
+    dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: mediaEndSecs });
     endPlay();
   }, [endPlay, mediaEndSecs, windowEnd]);
 
@@ -475,7 +477,7 @@ export function Player() {
         if (lp.in >= windowStart && lp.in < windowEnd) v.currentTime = lp.in - windowStart;
         reportedVideoTimeRef.current = lp.in;
         setVideoTime(lp.in);
-        dispatchRef.current({ type: "PLAYHEAD_SET", t: lp.in });
+        dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: lp.in });
         return;
       }
     }
@@ -486,7 +488,7 @@ export function Player() {
         /* keep the current decoded frame if the media element rejects the exact end */
       }
       setVideoTime(mediaEndSecs);
-      dispatchRef.current({ type: "PLAYHEAD_SET", t: mediaEndSecs });
+      dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: mediaEndSecs });
       pauseStatusRef.current = tr("播放结束");
       v.pause();
       endPlay();
@@ -498,7 +500,7 @@ export function Player() {
     reportedVideoTimeRef.current = boundedTime;
     if (playingRef.current || Math.abs(boundedTime - playheadRef.current) > 0.5) {
       suppressSeek.current = true;
-      dispatchRef.current({ type: "PLAYHEAD_SET", t: boundedTime });
+      dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: boundedTime });
       suppressSeek.current = false;
     }
   }, [endPlay, mediaEndSecs, mode, windowStart, windowEnd, usePrepared]);
@@ -551,7 +553,7 @@ export function Player() {
   useEffect(() => {
     const boundedPlayhead = Math.min(mediaEndSecs, Math.max(0, playhead));
     if (Math.abs(boundedPlayhead - playhead) > 0.001) {
-      dispatchRef.current({ type: "PLAYHEAD_SET", t: boundedPlayhead });
+      dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: boundedPlayhead });
     }
   }, [playhead, mediaEndSecs]);
 
@@ -600,7 +602,7 @@ export function Player() {
         reportedVideoTimeRef.current = current;
         setVideoTime(current);
         if (Math.abs(current - playheadRef.current) > 1 / 240)
-          dispatchRef.current({ type: "PLAYHEAD_SET", t: current });
+          dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: current });
       }
       schedule();
     };
@@ -628,7 +630,7 @@ export function Player() {
         }
         reportedVideoTimeRef.current = time;
         setVideoTime(time);
-        dispatchRef.current({ type: "PLAYHEAD_SET", t: time });
+        dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: time });
         const video = videoRef.current, bounds = windowBoundsRef.current;
         if (video && video.dataset.previewSource === bounds.source && video.readyState >= 2 && time >= bounds.start && time < bounds.end) {
           if (!video.seeking && Math.abs(video.currentTime - (time - bounds.start)) > .15)
@@ -758,9 +760,46 @@ export function Player() {
       dispatch({ type: "STATUS_SET", severity: "ok", text: msg("播放中") });
     }
   };
-  togglePlayRef.current = togglePlay;
+  togglePlayRef.current = () => {
+    const wasPlaying = playingRef.current;
+    window.dispatchEvent(new Event(CANCEL_AUDITION_EVENT));
+    // Cancelling an active audition has already performed the requested pause.
+    if (wasPlaying && !playingRef.current) {
+      dispatch({ type: "STATUS_SET", severity: "ok", text: msg("已暂停") });
+      return;
+    }
+    togglePlay();
+  };
+
+  useTranscriptAudition({
+    projectId: currentId, sequenceId: project?.sequence.id, revision: state.revision,
+    end: mediaEndSecs, playhead, scrubbing: state.scrubbing, video: videoRef,
+    windowStart, clock: audioPlaybackClock, seekVersion: state.playheadSeekVersion,
+    play: () => {
+      // An audition is one bounded pass, including when a shorter transport
+      // loop was already enabled. Update the ref before the next clock tick.
+      loopRef.current.enabled = false;
+      setLoopEnabled(false);
+      togglePlay();
+    },
+    pause: () => {
+      playingRef.current = false;
+      audioTransportRef.current.active = false;
+      setPlaying(false);
+      videoRef.current?.pause();
+    },
+    seek: time => {
+      reportedVideoTimeRef.current = time;
+      setVideoTime(time);
+      const video = videoRef.current;
+      if (video && time >= windowStart && time <= windowEnd) video.currentTime = time - windowStart;
+      dispatchRef.current({ type: "PLAYHEAD_SET", source: "transport", t: time });
+    },
+    onEnd: () => dispatchRef.current({ type: "STATUS_SET", severity: "ok", text: msg("已暂停") }),
+  });
 
   const stop = () => {
+    window.dispatchEvent(new Event(CANCEL_AUDITION_EVENT));
     playingRef.current = false;
     setPlaying(false);
     reportedVideoTimeRef.current = 0;
@@ -775,6 +814,7 @@ export function Player() {
   };
 
   const stepFrame = (dir: -1 | 1) => {
+    window.dispatchEvent(new Event(CANCEL_AUDITION_EVENT));
     if (!currentId) return;
     playingRef.current = false;
     setPlaying(false);
@@ -995,7 +1035,7 @@ export function Player() {
         <button className="player__iconbtn" onClick={stop} title={tr("回到开头")} aria-label={tr("回到开头")}>
           <SkipBack size={16} />
         </button>
-        <button className="player__play" onClick={togglePlay} disabled={!currentId} aria-label={playing ? tr("暂停") : tr("播放")} aria-pressed={playing} aria-keyshortcuts="Space" title={playing ? tr("暂停（空格）") : tr("播放（空格）")}>
+        <button className="player__play" onClick={() => togglePlayRef.current()} disabled={!currentId} aria-label={playing ? tr("暂停") : tr("播放")} aria-pressed={playing} aria-keyshortcuts="Space" title={playing ? tr("暂停（空格）") : tr("播放（空格）")}>
           {playing ? <Pause size={16} /> : <Play size={16} />}
         </button>
         <button className="player__iconbtn" onClick={stop} disabled={!currentId} title={tr("停止（归零）")} aria-label={tr("停止")}>

@@ -1,6 +1,7 @@
 import { flushPendingEdits } from "../lib/pendingEdits";
 import { setActiveProject } from "../lib/projectScope";
 import { clearSessionAssets } from "../lib/assetStore";
+import { isOlderRevision } from "../lib/projectSync";
 import { msg, tr } from "../i18n";
 /** 领域动作：封装 API 调用 + 状态派发。组件只调用这些动作，不含业务逻辑。 */
 
@@ -64,17 +65,23 @@ export async function selectProject(
 export async function refreshProject(
   dispatch: Dispatch<EditorAction>,
   projectId: string,
-  options: { quiet?: boolean } = {},
+  options: { quiet?: boolean; signal?: AbortSignal; isCurrent?: () => boolean } = {},
 ): Promise<boolean> {
+  const startedRevision = latestState?.currentId === projectId ? latestState.revision : undefined;
+  // A response may outlive its preview worker, including leaving and reopening
+  // the same project. Check ownership before *every* shared-state publication.
+  const current = () => !options.signal?.aborted && options.isCurrent?.() !== false &&
+    (!latestState || latestState.currentId === projectId);
   try {
     const project = await getProject(projectId);
-    if (latestState && latestState.currentId !== projectId) return false;
+    if (!current() || isOlderRevision(project.revision, latestState?.revision)) return false;
     dispatch({ type: "PROJECT_LOADED", project });
     dispatch({ type: "SVC_UP", up: true });
     if (!options.quiet) dispatch({ type: "STATUS_SET", severity: "ok", text: msg("就绪") });
     return true;
   } catch (err) {
-    if (latestState && latestState.currentId !== projectId) return false;
+    if (!current()) return false;
+    if (options.quiet && startedRevision !== undefined && latestState?.revision !== startedRevision) return false;
     dispatch({ type: "SYNC_STATE_SET", syncState: "error" });
     showError(dispatch, err);
     return false;
@@ -191,7 +198,7 @@ export async function runCommand(
   state: EditorState,
   type: string,
   payload: Record<string, unknown>,
-  opts: { autoShow?: boolean } = {},
+  opts: { autoShow?: boolean; retryConflict?: boolean; isCurrent?: () => boolean } = {},
 ): Promise<ActionResult> {
   const autoShow = opts.autoShow ?? true;
   if (!state.currentId) {
@@ -218,6 +225,7 @@ export async function runCommand(
     return { ok: false, error: err };
   }
   const projectId = state.currentId;
+  const ownsFeedback = () => opts.isCurrent?.() !== false;
   const doPost = async (expected: string) => {
     const commandId = newCommandId();
     rememberLocalCommand(projectId, commandId);
@@ -232,34 +240,38 @@ export async function runCommand(
   dispatch({ type: "SYNC_STATE_SET", syncState: "saving" });
   try {
     const result = await doPost(state.revision);
+    if (!ownsFeedback()) return { ok: true, command: result };
     dispatch({ type: "REVISION_SET", revision: result.revision });
     if (!type.startsWith("history.") && result.revision !== state.revision) {
       dispatch({ type: "UNDO_SET", blocked: false });
       dispatch({ type: "REDO_SET", blocked: true });
       dispatch({ type: "HISTORY_HINT", hint: "" });
     }
-    await refreshProject(dispatch, projectId);
+    await refreshProject(dispatch, projectId, { isCurrent: opts.isCurrent });
     return { ok: true, command: result };
   } catch (err) {
-    if (isRetryableConflict(err)) {
+    if (!ownsFeedback()) return { ok: false, error: err instanceof ApiFailure ? err : new ApiFailure({ status: 0, code: "NETWORK", message: String(err) }) };
+    if (opts.retryConflict !== false && isRetryableConflict(err)) {
       // 版本漂移：重新拉取最新 revision 后重试一次
       const fresh = latestState;
       const currentRev = fresh && fresh.currentId === projectId ? fresh.revision : state.revision;
-      const refreshed = await refreshProject(dispatch, projectId);
-      if (refreshed) {
+      const refreshed = await refreshProject(dispatch, projectId, { isCurrent: opts.isCurrent });
+      if (refreshed && ownsFeedback()) {
         const currentRev2 = latestState ? latestState.revision : currentRev;
         try {
           const result = await doPost(currentRev2);
+          if (!ownsFeedback()) return { ok: true, command: result };
           dispatch({ type: "REVISION_SET", revision: result.revision });
           if (!type.startsWith("history.") && result.revision !== currentRev2) {
             dispatch({ type: "UNDO_SET", blocked: false });
             dispatch({ type: "REDO_SET", blocked: true });
             dispatch({ type: "HISTORY_HINT", hint: "" });
           }
-          await refreshProject(dispatch, projectId);
+          await refreshProject(dispatch, projectId, { isCurrent: opts.isCurrent });
           return { ok: true, command: result };
         } catch (err2) {
           const f2 = err2 instanceof ApiFailure ? err2 : new ApiFailure({ status: 0, code: "NETWORK", message: String(err2) });
+          if (!ownsFeedback()) return { ok: false, error: f2 };
           dispatch({ type: "SYNC_STATE_SET", syncState: "error" });
           if (autoShow) showError(dispatch, f2);
           return { ok: false, error: f2 };
@@ -267,6 +279,7 @@ export async function runCommand(
       }
     }
     const f = err instanceof ApiFailure ? err : new ApiFailure({ status: 0, code: "NETWORK", message: String(err) });
+    if (!ownsFeedback()) return { ok: false, error: f };
     dispatch({ type: "SYNC_STATE_SET", syncState: "error" });
     if (autoShow) showError(dispatch, f);
     return { ok: false, error: f };

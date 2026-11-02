@@ -1,0 +1,107 @@
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+
+function moduleAt(relative, dependencies, globals = {}, extra = '') {
+  const source = readFileSync(new URL(relative, import.meta.url), 'utf8') + extra;
+  const { outputText } = ts.transpileModule(source, { compilerOptions: {
+    target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX,
+  } });
+  const exports = {};
+  runInNewContext(outputText, { exports, require: name => dependencies[name] || {}, Date, BigInt, ...globals });
+  return exports;
+}
+const events = { AUDITION_RANGE_EVENT: 'audition', CANCEL_AUDITION_EVENT: 'cancel', STOP_AUDITION_AUDIO_EVENT: 'audio-stop' };
+function harness() {
+  const window = new EventTarget(), document = Object.assign(new EventTarget(), { hidden: false });
+  let cursor = 0, serial = 0, pending = [];
+  const slots = [], frames = new Map();
+  const useEffect = (callback, dependencies) => {
+    const index = cursor++, previous = slots[index];
+    if (previous && dependencies.every((value, offset) => Object.is(value, previous.dependencies[offset]))) return;
+    pending.push(() => { previous?.cleanup?.(); slots[index] = { dependencies, cleanup: callback() }; });
+  };
+  const { useTranscriptAudition } = moduleAt('../src/components/useTranscriptAudition.ts', {
+    react: { useEffect, useLayoutEffect: useEffect, useRef: value => {
+      const index = cursor++; return slots[index] ||= { current: value };
+    } }, '../lib/transcript': events,
+  }, { window, document, Event, requestAnimationFrame: callback => { frames.set(++serial, callback); return serial; },
+    cancelAnimationFrame: id => frames.delete(id) });
+  let running = false, time = 3, pauses = 0, audioStops = 0, ended = 0;
+  const seeks = [];
+  window.addEventListener(events.STOP_AUDITION_AUDIO_EVENT, () => audioStops++);
+  let options = { projectId: 'p', sequenceId: 's', revision: '5', end: 5, playhead: 3, seekVersion: 0, scrubbing: false,
+    // This mutable ref reproduces the native transport leading React's render.
+    // It remains here to demonstrate that the previous implementation fails.
+    reportedTime: { current: 3 }, video: { current: null }, windowStart: 2,
+    clock: () => ({ time, playing: running }), play: () => { running = true; },
+    pause: () => { pauses++; running = false; }, seek: value => seeks.push(value), onEnd: () => ended++ };
+  const render = patch => {
+    options = { ...options, ...patch }; cursor = 0; pending = [];
+    useTranscriptAudition(options); for (const commit of pending) commit();
+  };
+  const frame = next => {
+    time = next; const callbacks = [...frames.values()]; frames.clear();
+    for (const callback of callbacks) callback(next * 1000);
+  };
+  const begin = () => window.dispatchEvent(new CustomEvent(events.AUDITION_RANGE_EVENT,
+    { detail: { projectId: 'p', sequenceId: 's', revision: '5', start: 3, end: 3.5 } }));
+  render({});
+  return { render, frame, begin, options: () => options, running: () => running, pauses: () => pauses,
+    seeks, audioStops: () => audioStops, ended: () => ended, window, document };
+}
+
+test('normal transport ahead of a delayed React render does not cancel a bounded audition', () => {
+  const h = harness(); h.begin(); h.frame(3); h.frame(3.412154195);
+  assert.equal(h.running(), true);
+  h.options().reportedTime.current = 3.412154195;
+  h.render({ playhead: 3.31 }); // a normal, stale transport render; no user intent
+  assert.equal(h.running(), true); assert.equal(h.pauses(), 1);
+  h.frame(3.51);
+  assert.equal(h.running(), false); assert.equal(h.seeks.at(-1), 3.5);
+  assert.equal(h.audioStops(), 1); assert.equal(h.ended(), 1);
+});
+test('an explicit sub-frame seek cancels audition even within its current range', () => {
+  const h = harness(); h.begin(); h.frame(3); h.frame(3.1);
+  h.render({ playhead: 3.101, seekVersion: 1 });
+  assert.equal(h.running(), false); assert.equal(h.audioStops(), 1); assert.equal(h.ended(), 0);
+  h.frame(3.6); assert.deepEqual(h.seeks, [3]); // cancellation preserves the requested seek
+});
+test('scrubbing and hidden-tab cancellation synchronously stop native voices', () => {
+  for (const cancel of ['scrub', 'hidden']) {
+    const h = harness(); h.begin(); h.frame(3); h.frame(3.1);
+    if (cancel === 'scrub') h.render({ scrubbing: true });
+    else { h.document.hidden = true; h.document.dispatchEvent(new Event('visibilitychange')); }
+    assert.equal(h.running(), false); assert.equal(h.audioStops(), 1);
+  }
+});
+test('the actual editor reducer distinguishes transport ticks from explicit user seek intent', () => {
+  const { reducer, initialState } = moduleAt('../src/store/editor.tsx', {
+    react: { createContext: () => ({}) },
+  }, {}, '\nexport { reducer, initialState };\n');
+  let state = initialState;
+  for (const time of [3, 3.1, 3.31, 3.412154195]) state = reducer(state, { type: 'PLAYHEAD_SET', t: time, source: 'transport' });
+  assert.equal(state.playhead, 3.412154195); assert.equal(state.playheadSeekVersion, 0);
+  state = reducer(state, { type: 'PLAYHEAD_SET', t: state.playhead + .001 });
+  assert.equal(state.playheadSeekVersion, 1);
+  state = reducer(state, { type: 'PLAYHEAD_SET', t: state.playhead });
+  assert.equal(state.playheadSeekVersion, 2); // same-position intent is still an explicit seek
+});
+
+test('scope cleanup stops audio without publishing a natural-end status', () => {
+  const h = harness(); h.begin(); h.frame(3); h.frame(3.1);
+  h.render({ revision: '6' });
+  assert.equal(h.running(), false); assert.equal(h.audioStops(), 1); assert.equal(h.ended(), 0);
+});
+
+test('a stale frame delivered before scope effect cleanup cannot seek or publish end feedback into the new editor', () => {
+  for (const changed of ['projectId', 'sequenceId', 'revision']) {
+    const h = harness(); h.begin(); h.frame(3); h.frame(3.1);
+    // React updated the latest-options ref, but passive cleanup has not run yet.
+    h.options()[changed] = 'different'; h.frame(4);
+    assert.equal(h.running(), false); assert.equal(h.audioStops(), 1); assert.equal(h.ended(), 0);
+    assert.deepEqual(h.seeks, [3]);
+  }
+});

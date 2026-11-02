@@ -68,7 +68,7 @@ MCP 与 Web 要共同编辑同一个工程，必须指向同一 `--data` 目录�
 
 ## 智能体操作顺序
 
-1. 用 `runtime` 确认版本与数据目录，先读 `editor_help({})`。用 `commands_list(type=目标命令)` 或 `query/offset/limit` 按需查询命令；效果用 `effects_list`。`capabilities` 保留完整快照，可能超过客户端输出上限，不必每次全量拉取。
+1. 用 `runtime` 确认版本与数据目录，先读 `editor_help({})`。用 `commands_list(includeSchemas=false)` 浏览轻量目录（保留描述与 `previewSupported`，省略 `params/inputSchema`），支持 `query/offset/limit`；选定后用 `commands_list(type=目标命令)` 或 `editor_help(topic=command, command=目标命令)` 获取完整参数。`includeSchemas` 默认 true，效果用 `effects_list`。`capabilities` 保留完整快照，可能超过客户端输出上限，不必每次全量拉取。
 2. 使用 `project_summary` / `project_lookup` 获取当前 revision 与目标对象；需要完整内容时使用 `project_query`。
 3. 先检查 `commands_list` 返回的目标命令的 `previewSupported`；为 true 时可用 `command_preview` 预演。导出、音频处理、创建或取消任务等外部副作用命令不能预演，应明确提交 `command_apply`。编辑多个对象前使用 `edit_lock` 获取租约。
 4. `command_apply` 带上当前 `expectedRevision`、租约和可复用的 `commandId`。时间使用 `{ "num": "1", "den": "2" }`。

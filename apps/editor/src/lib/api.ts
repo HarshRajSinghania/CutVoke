@@ -191,7 +191,13 @@ export async function getProject(projectId: string): Promise<Project> {
     const query = prior ? `?${new URLSearchParams({ token: prior.token })}` : "";
     const result = await get<{ token: string; unchanged: boolean; project?: CompactProject }>(
       `/projects/${encodeURIComponent(projectId)}/sync${query}`);
-    if (result.unchanged && prior) return prior.project;
+    if (result.unchanged && prior) {
+      // "Unchanged" describes the request's token, which may already be older
+      // than a concurrent sync that finished while this response was in flight.
+      const current = projectCache.get(projectId);
+      if (current && current !== prior && BigInt(current.project.revision) > BigInt(prior.project.revision)) return current.project;
+      return prior.project;
+    }
     if (!result.project || !result.token) throw new Error(tr("工程同步响应不完整，请刷新后重试。"));
     const project = reuseProjectStructure(prior?.project, expandProject(result.project));
     // A slow older response must not replace a newer committed state in the cache.
@@ -263,6 +269,20 @@ export async function sendCommand(
 }
 
 export type ExportQuality = "high" | "medium" | "low";
+
+export interface CommandPreview {
+  valid: boolean;
+  commandType: string;
+  changedEntities: Array<{ type: string; id?: string; change?: string;
+    timelineRange?: { before: { start: Rational; end: Rational } | null; after: { start: Rational; end: Rational } | null } }>;
+}
+
+/** Same read-only trial as MCP command_preview; creates no revision or undo entry. */
+export async function previewCommand(projectId: string, type: string, payload: Record<string, unknown>, expectedRevision: string): Promise<CommandPreview> {
+  return post<CommandPreview>(`/projects/${encodeURIComponent(projectId)}/commands`, {
+    type, payload, expectedRevision, commandId: newCommandId(), dryRun: true, actor: { kind: "human", id: "ui" },
+  });
+}
 
 export interface ExportOptions {
   sequenceId?: string;

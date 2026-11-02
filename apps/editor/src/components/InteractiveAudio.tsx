@@ -3,6 +3,7 @@ import { useEditor } from "../store/editor";
 import { pendingCommands, useInteractionProject } from "../store/interactive";
 import { probeMedia } from "../lib/mediaApi";
 import { rationalToSecs } from "../lib/rational";
+import { STOP_AUDITION_AUDIO_EVENT } from "../lib/transcript";
 import { sourceTime } from "./InteractiveScene";
 
 const AUDIO_FX = new Set(["cutvoke.fx.equalizer", "cutvoke.fx.compressor", "cutvoke.fx.loudnorm", "cutvoke.fx.pan", "cutvoke.fx.sidechainDuck"]);
@@ -23,6 +24,11 @@ export function InteractiveAudio({ playing, onReady, playbackClock, onClockSourc
   const meter = useRef<HTMLOutputElement>(null);
   const latest = useRef({ project, time: state.playhead, playing, onReady, playbackClock, onClockSource });
   latest.current = { project, time: state.playhead, playing, onReady, playbackClock, onClockSource };
+  useEffect(() => {
+    const pause = () => { for (const voice of voices.current.values()) voice.element.pause(); };
+    window.addEventListener(STOP_AUDITION_AUDIO_EVENT, pause);
+    return () => window.removeEventListener(STOP_AUDITION_AUDIO_EVENT, pause);
+  }, []);
   useEffect(() => {
     const unlock = () => { if (context.current?.state === "suspended") void context.current.resume(); };
     document.addEventListener("pointerdown", unlock);

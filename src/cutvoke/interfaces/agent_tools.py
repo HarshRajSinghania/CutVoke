@@ -59,8 +59,9 @@ AGENT_TOOLS = [
     _tool("project_clone", "复制当前 revision 为新的可编辑工程；原工程不变，副本从 revision 0 开始。",
           {**REVISION, "newProjectId": STRING, "name": {"type": "string"}},
           ("projectId", "expectedRevision")),
-    _tool("commands_list", "按命令名检索编辑参数，返回每个命令的 payload inputSchema；先查询再填 payload。查具体效果的参数用 editor_help(topic=command, command=..., effectId=...)。批量编辑用 edit.batch。",
-          {"type": STRING, "query": {"type": "string"}, **PAGE}),
+    _tool("commands_list", "按命令名检索编辑参数，默认返回每个命令的 payload inputSchema；includeSchemas=false 仅返回轻量目录（省略 params/inputSchema）。先查询再填 payload；详情用 editor_help(topic=command, command=..., effectId=...)。previewSupported 只表示能否预演，不表示无副作用。批量编辑用 edit.batch。",
+          {"type": STRING, "query": {"type": "string"},
+           "includeSchemas": {"type": "boolean", "default": True}, **PAGE}),
     _tool("media_import", "每批最多 32 个文件。流式复制本机素材到持久素材库，探测尺寸/声音/时长；传 projectId 保存到该工程素材表，同一内容重复导入返回同一 assetId。不会创建时间线片段。",
           {**PROJECT, "paths": {"type": "array", "minItems": 1, "maxItems": 32, "items": STRING}}, ("paths",)),
     _tool("media_list", "分页检索持久素材库；可按类型、名称、工程已用/未用过滤。返回可直接用于 clip.insert 的 assetId。",
@@ -185,7 +186,7 @@ class AgentTools:
                 "sourceProjectId": source_id, "sourceRevision": source_revision}
 
     def commands_list(self, a):
-        entries = self.service.command_catalog()
+        entries = self.service.command_catalog(include_schemas=a.get("includeSchemas", True))
         query = a.get("query", "").casefold()
         entries = [item for item in entries if (not a.get("type") or item["type"] == a["type"])
                    and query in (item["type"] + " " + item["description"]).casefold()]

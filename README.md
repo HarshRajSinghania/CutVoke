@@ -109,6 +109,8 @@ flowchart LR
 
 The timeline supports multiple media tracks, text and captions, clip adjustments, volume and fades, keyframes, and existing transitions/effects. Edits can be previewed and undone/redone; an editing lease keeps grouped agent changes from colliding with manual writes. Continuous preview prepares time windows and reuses cached work. Exports use the project version captured when queued.
 
+For spoken edits, search the transcript, locate or audition a sentence/word range, then preview the deletion's impact before explicitly confirming it. The cut keeps picture, audio and captions in sync and can be undone once. Ordinary caption text edits only change captions. See [text-based editing](docs/user/ADVANCED_TIMELINE.md).
+
 For the latest source build, see the [production workflow](docs/production-workflow.md): standalone titles, reusable attached layers, on-demand previews and production archives.
 
 ![CutVoke English caption editor with selected text, start and end times, and the actual preview](docs/images/readme/en/caption-editing.png)
@@ -239,7 +241,7 @@ MCP includes `editor_help` for current commands, units, recipes and recovery, pl
 
 The standard MCP launcher automatically activates healthy engine updates while keeping the connection and existing render jobs. See [automatic update behavior and limits](docs/production-workflow.md#runtime-changes--服务版本变化); previously running launchers need one initial reconnect.
 
-Source MCP-only installs can use `python -m cutvoke doctor --mcp-only --json` without building the browser editor. Start discovery with `editor_help`, then `commands_list`/`effects_list` for the needed items; `capabilities` returns a large complete snapshot. See [installation diagnostics](docs/user/installation.md).
+Source MCP-only installs can use `python -m cutvoke doctor --mcp-only --json` without building the browser editor. Start discovery with `editor_help`, then `commands_list(includeSchemas=false)` for a lightweight searchable index and `editor_help(topic="command", command="…")` for a selected payload schema. `effects_list` discovers effects; `capabilities` returns a large complete snapshot. See [installation diagnostics](docs/user/installation.md).
 
 **Use it:** copy the complete `skills/cutvoke-editor/` folder into your AI tool's skill directory, or let a tool that accepts Markdown instructions read `SKILL.md`. [The installation and usage guide](docs/user/agent-skill.md) includes concrete Codex copy commands and the verified scope. Keep `references/` and `scripts/` with the entry point.
 
