@@ -361,7 +361,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   // This snapshot updates for every editing change; event handlers read the live
   // playhead through getLatestState() when they need a clock value.
   if ((Object.keys(state) as (keyof EditorState)[]).some((key) =>
-    key !== "playhead" && key !== "lastSync" && state[key] !== editingState.current[key])) {
+    key !== "playhead" && key !== "playheadSeekVersion" && key !== "lastSync" && state[key] !== editingState.current[key])) {
     editingState.current = state;
   }
   const editingValue = useMemo(() => ({ state: editingState.current, dispatch }), [editingState.current, dispatch, locale]);

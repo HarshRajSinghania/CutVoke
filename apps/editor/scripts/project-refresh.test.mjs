@@ -116,3 +116,27 @@ test("a reviewed deletion never retries a conflict at a different revision", asy
     { retryConflict: false, autoShow: false });
   assert.equal(result.ok, false); assert.equal(calls, 1); assert.equal(result.error.code, "REVISION_CONFLICT");
 });
+
+test("clock and user-seek bookkeeping preserve editing-only subscriptions, while edits refresh them", () => {
+  let state, cursor = 0; const slots = [], dispatch = () => {};
+  const { EditorProvider, initialState } = moduleAt("../src/store/editor.tsx", {
+    "../i18n": { tr: value => value, useLocale: () => "zh-CN" },
+    "react/jsx-runtime": { jsx: (type, props) => ({ type, props }) },
+    react: { createContext: () => ({ Provider: {} }), useReducer: () => [state, dispatch], useEffect: () => {},
+      useRef: value => { const index = cursor++; return slots[index] ||= { current: value }; },
+      useMemo: (create, dependencies) => {
+        const index = cursor++, prior = slots[index];
+        if (prior && dependencies.every((value, at) => Object.is(value, prior.dependencies[at]))) return prior.value;
+        const value = create(); slots[index] = { dependencies, value }; return value;
+      } },
+  }, "\nexport { initialState };\n");
+  state = initialState;
+  const render = () => { cursor = 0; return EditorProvider({ children: null }).props.children.props.value; };
+  const before = render();
+  for (let tick = 1; tick <= 60; tick++) {
+    state = { ...state, playhead: tick / 60, playheadSeekVersion: tick, lastSync: tick };
+    assert.equal(render(), before); // A ruler drag must not invalidate every media/clip row.
+  }
+  state = { ...state, revision: "1" };
+  assert.notEqual(render(), before);
+});
