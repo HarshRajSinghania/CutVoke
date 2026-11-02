@@ -19,11 +19,10 @@ export function useTranscriptAudition(options: Options) {
   const latest = useRef(options);
   latest.current = options;
   const active = useRef<TranscriptAudition | null>(null);
-  const starting = useRef(false);
   const frame = useRef(0);
   const stop = (end?: number) => {
     if (!active.current) return;
-    active.current = null; starting.current = false;
+    active.current = null;
     cancelAnimationFrame(frame.current);
     latest.current.pause();
     // Native audio voices are detached elements. Pause synchronously even when
@@ -33,11 +32,11 @@ export function useTranscriptAudition(options: Options) {
   };
   // Seeking or scrubbing deliberately ends an audition, including seeks inside its range.
   useLayoutEffect(() => {
-    if (!active.current || starting.current) return;
+    if (!active.current) return;
     if (options.scrubbing) stop();
   }, [options.scrubbing]);
   useLayoutEffect(() => {
-    if (active.current && !starting.current) stop();
+    if (active.current) stop();
   }, [options.seekVersion]);
   useEffect(() => {
     const begin = (event: Event) => {
@@ -47,13 +46,20 @@ export function useTranscriptAudition(options: Options) {
         !Number.isFinite(range.start) || !Number.isFinite(range.end) || range.start < 0 || range.end <= range.start || range.start >= current.end) return;
       stop(); current.pause();
       active.current = { ...range, end: Math.min(current.end, range.end) };
-      starting.current = true;
       current.seek(range.start);
       // Let the seek render before starting the normal player transport.
       frame.current = requestAnimationFrame(() => {
-        if (!active.current) return;
-        latest.current.play();
-        starting.current = false;
+        const target = active.current;
+        if (!target) return;
+        const now = latest.current;
+        if (now.projectId !== target.projectId || now.sequenceId !== target.sequenceId || now.revision !== target.revision) {
+          // The old transport was already paused at begin(). Do not run any
+          // callbacks belonging to the newly rendered editor before cleanup.
+          active.current = null;
+          return;
+        }
+        if (now.scrubbing || document.hidden) { stop(); return; }
+        now.play();
         const tick = () => {
           const target = active.current;
           if (!target) return;

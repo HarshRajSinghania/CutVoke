@@ -96,6 +96,31 @@ test('scope cleanup stops audio without publishing a natural-end status', () => 
   assert.equal(h.running(), false); assert.equal(h.audioStops(), 1); assert.equal(h.ended(), 0);
 });
 
+for (const input of ['seek', 'scrub']) {
+  test(`a ${input} before the first animation frame cancels pending audition startup`, () => {
+    const h = harness(); h.begin();
+    h.render(input === 'seek' ? { playhead: 3.2, seekVersion: 1 } : { scrubbing: true });
+    h.frame(3.2); h.frame(3.3);
+    assert.equal(h.running(), false); assert.equal(h.audioStops(), 1);
+    assert.deepEqual(h.seeks, [3]); assert.equal(h.ended(), 0);
+  });
+}
+for (const key of ['projectId', 'sequenceId', 'revision']) {
+  test(`a changed ${key} before passive cleanup cannot start or pause the new scope`, () => {
+    const h = harness(); h.begin();
+    h.options()[key] = 'new-scope'; // Render delivered; passive cleanup has not run yet.
+    h.frame(3.2); h.frame(3.3);
+    assert.equal(h.running(), false); assert.equal(h.pauses(), 1); // Only begin's original pause.
+    assert.equal(h.audioStops(), 0); assert.deepEqual(h.seeks, [3]); assert.equal(h.ended(), 0);
+  });
+}
+test('a tab hidden before pending startup cannot begin playback without a visibility event', () => {
+  const h = harness(); h.begin(); h.document.hidden = true;
+  h.frame(3.2); h.frame(3.3);
+  assert.equal(h.running(), false); assert.equal(h.audioStops(), 1);
+  assert.deepEqual(h.seeks, [3]); assert.equal(h.ended(), 0);
+});
+
 test('a stale frame delivered before scope effect cleanup cannot seek or publish end feedback into the new editor', () => {
   for (const changed of ['projectId', 'sequenceId', 'revision']) {
     const h = harness(); h.begin(); h.frame(3); h.frame(3.1);
