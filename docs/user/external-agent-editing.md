@@ -78,3 +78,6 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 不读取个人工程库。`--engine` 可以指定安装版引擎；完整参数见 `--help`。
 运行后使用 `cutvoke serve --data .artifacts/agent-demo/data` 打开同一演示工程，
 检查人工接手、文字修改和保存。详细输出保留在该临时目录。
+
+
+创作型任务可先用 `creative_workflow({"operation":"list","query":"旅行","locale":"zh-CN"})` 找配方，再取单张详情和 plan/review/repair schema。审片记录须附当前 projectId/revision/sequenceId、实际成片或抽帧证据；局部修复使用 `preview-repair`，显式提交后重新生成证据。详见[可执行创作闭环](../../skills/cutvoke-editor/references/creative-workflow.md)。此入口不自动判断艺术质量，不打开证据文件，也不替代事实与原意核对。

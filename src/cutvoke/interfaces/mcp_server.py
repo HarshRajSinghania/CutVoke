@@ -314,7 +314,9 @@ class MCPServer:
             if "pattern" in schema and re.search(schema["pattern"], value) is None:
                 raise ValueError(f"{path} does not match {schema['pattern']}")
         elif expected in ("number", "integer"):
-            if not math.isfinite(value):
+            # Python integers are finite. Converting an arbitrarily large JSON
+            # integer to a C double can itself raise OverflowError (HTTP 500).
+            if isinstance(value, float) and not math.isfinite(value):
                 raise ValueError(f"{path} must be finite")
             for key, compare in (("minimum", lambda v, bound: v >= bound),
                                  ("maximum", lambda v, bound: v <= bound),
@@ -346,6 +348,9 @@ class MCPServer:
             self._validate_arguments(arguments, tool["inputSchema"])
             if name == "editor_help":
                 return {"ok": True, "help": EditorGuide(self.service).help(arguments)}
+            if name == "creative_workflow":
+                from cutvoke.interfaces.creative_workflow import CreativeWorkflow
+                return {"ok": True, **CreativeWorkflow(self.service).call(arguments)}
             if name == 'project_list':
                 from cutvoke.interfaces.agent_tools import project_listing
                 return {'ok': True, **project_listing(self.service, arguments)}

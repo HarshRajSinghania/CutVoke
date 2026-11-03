@@ -12,7 +12,8 @@ def prepare(root=None):
     directory=package/'assets'/'extension_packages';directory.mkdir(parents=True,exist_ok=True)
     archive_path=directory/'cutvoke-workers.zip';expanded=0
     with zipfile.ZipFile(archive_path,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
-        sources = [*package.rglob('*.py'), *(package/'assets'/'editor_guides').glob('*.md')]
+        sources = [*package.rglob('*.py'), *(package/'assets'/'editor_guides').glob('*.md'),
+                   package/'catalogs'/'creative_recipes.json']
         for source in sorted(sources):
             if '__pycache__' in source.parts:continue
             name='cutvoke/'+source.relative_to(package).as_posix();payload=source.read_bytes();expanded+=len(payload)

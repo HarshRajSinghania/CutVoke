@@ -18,6 +18,7 @@ from cutvoke.domain.protocol import ErrorCode
 from cutvoke.editing.service import EditError
 from cutvoke.editing.effect_modules import RECIPE_SCHEMA, PRIVACY
 from cutvoke.interfaces.creative_guides import GUIDE_FILES
+from cutvoke.interfaces.creative_workflow import TOOL as CREATIVE_TOOL, CreativeWorkflow
 
 
 def _tool(name, description, properties, required=()):
@@ -32,6 +33,7 @@ PAGE = {"offset": {"type": "integer", "minimum": 0}, "limit": LIMIT}
 PROJECT = {"projectId": STRING}
 REVISION = {**PROJECT, "expectedRevision": STRING}
 AGENT_TOOLS = [
+    CREATIVE_TOOL,
     _tool('transition_preview', 'Render quarter/middle/three-quarter transition pictures, optionally beside a plain dissolve. Read-only; returns at most six PNGs and their revision, without changing the project.',
           {**REVISION,'clipId':STRING,'fractions':{'type':'array','minItems':1,'maxItems':3,
              'items':{'type':'number','minimum':.05,'maximum':.95}},
@@ -195,6 +197,9 @@ class AgentTools:
     def editor_help(self, a):
         from cutvoke.interfaces.editor_guide import EditorGuide
         return {"help": EditorGuide(self.service).help(a)}
+
+    def creative_workflow(self, a):
+        return CreativeWorkflow(self.service).call(a)
 
     def effect_module_save(self, a):
         return self.service.effect_modules.save(a["recipe"])

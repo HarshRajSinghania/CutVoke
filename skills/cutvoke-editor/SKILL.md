@@ -25,6 +25,8 @@ Use three layers, with depth proportional to the work:
 | Tutorial, explanation, interview | [explainer.md](references/workflows/explainer.md) | `explainer` |
 | Promotion, demonstration, showcase | [showcase.md](references/workflows/showcase.md) | `showcase` |
 
+For machine-readable purpose/style selection, use `creative_workflow(operation="list", query="...")`, then retrieve one recipe and the plan/review/repair contracts. Read [creative-workflow.md](references/creative-workflow.md) for the revision-bound review and local repair loop; `guide="creative-workflow"` is available without this Skill. These checks organize evidence and safe previews, not artistic acceptance.
+
 MCP-only clients get the same guidance with `editor_help(topic="creative")` for a small index, then `editor_help(topic="creative", guide="<id>")` for one document. `principles`, `project-plan`, `review` and `efficiency` are also guide IDs. MCP document resources provide the same content; an installed Skill is optional.
 
 ## Bind work to the editable project

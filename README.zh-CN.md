@@ -239,6 +239,8 @@ cutvoke mcp --data .artifacts/first-edit/data
 
 MCP 自带 `editor_help`，支持当前命令、单位、范例与恢复；`topic="creative"` 提供按需读取的统一原则、分类指引和项目方案。可选的 [cutvoke-editor 技能](skills/cutvoke-editor/SKILL.md) 使用相同参考，覆盖 MV/艺术视觉、纪实旅行、叙事、讲解访谈、宣传展示。风格服从用户目标，以实际动态画面和声音验收表达，不以效果数量代替质量。来源与采用边界见[调研沉淀](docs/research/AI_EDITING_WORKFLOWS_2026-10-28.md)。
 
+`creative_workflow` 提供按主题检索的中英文用途／风格配方，以及绑定版本的计划、审片与局修约定。局修复用已有事务预演，检查影响范围和保护区后由 Agent 显式提交。见[可调用闭环与合成素材 MCP 示例](skills/cutvoke-editor/references/creative-workflow.md)；这些检查不代表创作质量已验收。
+
 标准 MCP 启动入口会自动切换到通过检查的新引擎，保持连接和已提交的渲染任务。详见[自动更新行为与边界](docs/production-workflow.md#runtime-changes--服务版本变化)；之前已经运行的旧启动器首次接入时需要重连一次。
 
 源码版仅使用 MCP 时，可运行 `python -m cutvoke doctor --mcp-only --json`，无需构建浏览器编辑器。能力发现先用 `editor_help`，再用 `commands_list(includeSchemas=false)` 搜索轻量命令索引，用 `editor_help(topic="command", command="…")` 获取选定命令的 payload schema。效果查询使用 `effects_list`；`capabilities` 返回较大的完整快照。详见[安装诊断](docs/user/installation.md)。
