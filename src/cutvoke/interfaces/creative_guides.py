@@ -7,6 +7,8 @@ from pathlib import Path
 
 # Relative to skills/cutvoke-editor; this is also the build's explicit allowlist.
 GUIDE_FILES = {
+    "creative-workflow": ("references/creative-workflow.md", "Executable creative recipes and review artifacts", 3,
+                          "Select a purpose/style recipe; validate a versioned plan/review and preview a bounded repair."),
     "principles": ("references/principles.md", "Shared creative principles", 1,
                    "New edits and substantial redesigns; apply relevant principles only for local corrections."),
     "music-video": ("references/workflows/music-video.md", "Music video and artistic visual work", 2,
@@ -47,6 +49,8 @@ def catalog() -> dict:
                 "Local corrections reuse the approved direction: read the needed command and affected review guidance, not all workflows or a new treatment.",
                 "Review is proportional; efficiency is optional. User intent determines intensity, not a mandatory gentle or spectacular style.",
                 "Bodies are loaded one at a time. Use the returned request or URI; no external Skill, repository or filesystem access is required."],
+            "recipes": {"tool": "creative_workflow", "arguments": {"operation": "list", "limit": 3},
+                        "usage": "Search by query in English or Chinese, purpose or style. Fetch one recipe, then plan/review/repair schemas on demand. Purpose, style and publishing dimensions are separate."},
             "guides": [descriptor(key) for key in GUIDE_FILES]}
 
 

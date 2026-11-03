@@ -24,6 +24,8 @@ export function useProjectPreparation() {
   const [job, setJob] = useState<PreviewJob | null>(null);
   const [error, setError] = useState<string | null>(null);
   const contentKey = useMemo(() => previewContentKey(state.project), [state.project]);
+  const contentKeyRef = useRef(contentKey);
+  contentKeyRef.current = contentKey;
   const projectRef = useRef(state.project);
   projectRef.current = state.project;
   const openingRef = useRef(state.opening);
@@ -55,6 +57,11 @@ export function useProjectPreparation() {
     const initialOpening = state.opening;
     const controller = new AbortController();
     const { signal } = controller;
+    const isCurrent = () => {
+      const latest = getLatestState();
+      return !signal.aborted && latest?.currentId === projectId && latest.view === "editor" &&
+        contentKeyRef.current === contentKey;
+    };
     let jobId: string | undefined;
     let budgetTimer = 0;
     let enteredEditor = !initialOpening;
@@ -92,7 +99,7 @@ export function useProjectPreparation() {
           await image.decode();
         } finally { URL.revokeObjectURL(result.url); }
       }
-      if (signal.aborted) return;
+      if (!isCurrent()) return;
       enteredEditor = true;
       dispatch({ type: "PROJECT_OPEN_READY", projectId });
     }).catch(() => { /* The window preparation below reports actionable errors. */ });
@@ -105,7 +112,7 @@ export function useProjectPreparation() {
       // idle interval instead of leaving edited complex projects on short
       // windows forever; subsequent edits cancel this immutable request.
       if (!initialOpening) for (let tick = 0; tick < Math.ceil(budget.delayMs / 250); tick++) await pause(signal);
-      if (signal.aborted) return;
+      if (!isCurrent()) return;
       let current = await previewRequest<PreviewJob>(
         `projects/${encodeURIComponent(projectId)}/preview-jobs`, undefined, { revision: project.revision, editorTitles: true });
       jobId = current.jobId;
@@ -114,7 +121,7 @@ export function useProjectPreparation() {
         cancelPreparation();
       }, budget.wallSeconds * 1000);
       while (true) {
-        if (signal.aborted) return;
+        if (!isCurrent()) return;
         setJob(current); setPhase(current.phase); setProgress(Math.floor(current.progress * 0.9));
         if (current.state === "failed" || current.state === "cancelled") {
           const latest = getLatestState();
@@ -145,25 +152,26 @@ export function useProjectPreparation() {
       if (openingRef.current) decodeTimerRef.current = window.setTimeout(
         () => setError(tr("首帧解码超时，请重试加载。")), 15000);
     })().catch(async (failure: unknown) => {
-      if (!signal.aborted && failure instanceof ApiFailure && failure.code === "REVISION_CONFLICT") {
+      if (isCurrent() && failure instanceof ApiFailure && failure.code === "REVISION_CONFLICT") {
         // A local edit can commit before its new snapshot reaches this worker.
         // Reconcile that immutable request without replacing the edit feedback
         // with a false reload warning (or a generic ready message).
-        const refreshed = await refreshProject(dispatch, projectId, { quiet: true });
-        if (signal.aborted) return;
+        const refreshed = await refreshProject(dispatch, projectId, { quiet: true, signal, isCurrent });
+        if (!isCurrent()) return;
         const latest = getLatestState();
-        if (refreshed && latest?.currentId === projectId && latest.project?.revision !== project.revision) {
+        if (latest?.currentId === projectId && latest.project?.revision !== project.revision) {
           setRetry(value => value + 1);
           return;
         }
+        if (!refreshed) return; // A live refresh failure already reported its real error.
       }
-      if (!signal.aborted && !jobId && failure instanceof ApiFailure && failure.status === 404) {
+      if (isCurrent() && !jobId && failure instanceof ApiFailure && failure.status === 404) {
         dispatch({ type: "PROJECT_OPEN_READY", projectId });
         dispatch({ type: "STATUS_SET", severity: "warn",
           text: msg("重启 CutVoke 服务后可启用完整预览加载，当前使用分段预览") });
         return;
       }
-      if (!signal.aborted) {
+      if (isCurrent()) {
         const message = failure instanceof Error ? failure.message : tr("预览准备失败");
         if (openingRef.current) setError(message);
         else dispatch({ type: "STATUS_SET", severity: "warn", text: message });

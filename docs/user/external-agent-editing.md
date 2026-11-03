@@ -20,7 +20,9 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 
 客户端支持 MCP 文档资源时，可以读取 `cutvoke://guide/overview`、`cutvoke://guide/time`、`cutvoke://guide/editing`、`cutvoke://guide/errors` 和 `cutvoke://commands`。不支持或不自动读取资源的客户端，使用 `editor_help` 工具可以获得相同内容。
 
-具体命令使用 `editor_help({"topic":"command","command":"clip.insert"})` 查询。返回的 `inputSchema` 描述 **payload**，不是 `command_apply` 的外层参数。效果命令再传 `effectId`，即可获取该效果注册表中的精确参数 schema。`commands_list` 也返回命令 schema；不必一次加载所有命令。
+具体命令使用 `editor_help({"topic":"command","command":"clip.insert"})` 查询。返回的 `inputSchema` 描述 **payload**，不是 `command_apply` 的外层参数。效果命令再传 `effectId`，即可获取该效果注册表中的精确参数 schema。`commands_list` 默认也返回命令 schema；`commands_list({"includeSchemas":false})` 返回省略 `params` / `inputSchema` 的轻量目录，保留名称、描述、`previewSupported` 和批量命令限制，仍支持 `type` / `query` / `offset` / `limit`。选定命令后再查详情。不修改工程 revision 的命令仍可能录音、写文件或运行模型；`previewSupported` 只说明是否支持预演。HTTP 的 `POST /api/v1/agent/commands_list` 使用相同 JSON 参数和响应。
+
+从剪辑意图开始检索，例如 `commands_list({"query":"字幕","includeSchemas":false,"limit":10})`。目录用于找到操作，不替代选材和剪辑判断。讲解或访谈可继续读取 `editor_help({"topic":"creative","guide":"explainer"})`：先保留观点与原句的素材时间码，检查句子前后语义，再查询 `transcript.delete` 的详情并预演影响；按已有授权提交后，试听剪点并检查画面是否支持所讲内容。节奏与成片质量的复核使用现有 `guide:"review"`；命令成功或预演合法不代表旁白自然、画面有说服力。
 
 `editor_help({"topic":"recipes"})` 列出可执行范例，包括建立可编辑时间线、精确修改字幕和异步导出。范例里的 `<PROJECT>`、`<REVISION>`、`<ASSET>` 等占位符由 AI 用实际查询结果替换；用户只需说明剪辑需求并提供素材访问权限。工程不明确或缺少必要素材时，AI 仍需澄清这些信息。
 
@@ -76,3 +78,6 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 不读取个人工程库。`--engine` 可以指定安装版引擎；完整参数见 `--help`。
 运行后使用 `cutvoke serve --data .artifacts/agent-demo/data` 打开同一演示工程，
 检查人工接手、文字修改和保存。详细输出保留在该临时目录。
+
+
+创作型任务可先用 `creative_workflow({"operation":"list","query":"旅行","locale":"zh-CN"})` 找配方，再取单张详情和 plan/review/repair schema。审片记录须附当前 projectId/revision/sequenceId、实际成片或抽帧证据；局部修复使用 `preview-repair`，显式提交后重新生成证据。详见[可执行创作闭环](../../skills/cutvoke-editor/references/creative-workflow.md)。此入口不自动判断艺术质量，不打开证据文件，也不替代事实与原意核对。

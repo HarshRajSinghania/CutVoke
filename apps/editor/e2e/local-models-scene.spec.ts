@@ -29,7 +29,11 @@ test('local 3D objects, OBJ import, editable geometry and undo are available in 
   await expect.poll(async()=>(await objects()).length).toBe(3);
   await controls.getByLabel('OBJ 模型文件',{exact:true}).setInputFiles({name:'triangle.obj',mimeType:'text/plain',buffer:Buffer.from('v -1 -1 0\nv 1 -1 0\nv 0 1 0\nf 1 2 3')});
   await expect.poll(async()=>(await objects()).length).toBe(4);expect((await objects()).at(-1).shape).toBe('mesh');
+  // Backend persistence can precede the inspector snapshot. Verify the imported
+  // and then undone object identities before typing into a replacement form.
+  await expect(controls.getByRole('combobox',{name:'三维物体',exact:true}).locator('option')).toHaveText((await objects()).map((item:{id:string})=>item.id));
   await page.getByRole('button',{name:'撤销',exact:true}).click();await expect.poll(async()=>(await objects()).length).toBe(3);
+  await expect(controls.getByRole('combobox',{name:'三维物体',exact:true}).locator('option')).toHaveText((await objects()).map((item:{id:string})=>item.id));
   const camera=effect.locator('[data-parameter="camera"]');await camera.locator(':scope > summary').click();
   await camera.getByRole('spinbutton',{name:'视野角度',exact:true}).fill('60');await camera.getByRole('spinbutton',{name:'视野角度',exact:true}).blur();
   await expect.poll(async()=>(await read(request,id)).sequence.tracks[1].clips[0].effects[0].params.camera.fov).toBe(60);

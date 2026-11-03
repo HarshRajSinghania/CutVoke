@@ -2,6 +2,11 @@ import type { Project, Sequence } from "../types/api";
 
 export type CompactProject = Omit<Project, "sequence"> & { sequence?: Sequence; activeSequenceId?: string };
 
+/** Server revisions are monotonic decimal integers, including undo/redo. */
+export function isOlderRevision(incoming: string, current?: string): boolean {
+  return !!current && /^\d+$/.test(incoming) && /^\d+$/.test(current) && BigInt(incoming) < BigInt(current);
+}
+
 /** Keep the legacy view as an alias, rather than a second decoded active sequence. */
 export function expandProject(raw: CompactProject): Project {
   const sequence = raw.activeSequenceId ? raw.sequences?.find(item => item.id === raw.activeSequenceId) : raw.sequence;

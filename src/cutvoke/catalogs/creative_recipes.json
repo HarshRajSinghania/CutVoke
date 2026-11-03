@@ -1,0 +1,2654 @@
+{
+  "schemaVersion": 1,
+  "report": "AI视频制作实战经验与CutVoke改进路线; research through 2026-11-02",
+  "qualityClaim": "Synthesized options for experiments, not proven optimal templates. Contract validity, successful rendering and automatic measurements do not establish artistic quality or factual/rights approval.",
+  "purposes": [
+    "product-brand",
+    "dialogue",
+    "highlights",
+    "knowledge",
+    "tutorial",
+    "travel",
+    "news-history",
+    "portrait",
+    "fiction",
+    "music",
+    "event",
+    "private-memory"
+  ],
+  "styles": [
+    "demonstration",
+    "causal-story",
+    "concept-montage",
+    "conversation",
+    "explanation",
+    "sensory-essay",
+    "fact-chain",
+    "observation",
+    "performance",
+    "event-story",
+    "relationship-memory"
+  ],
+  "recipes": [
+    {
+      "id": "product-demonstration",
+      "purposes": [
+        "product-brand"
+      ],
+      "style": "demonstration",
+      "guideId": "showcase",
+      "sourceIds": [
+        "E01",
+        "E02"
+      ],
+      "tags": [
+        "true",
+        "product",
+        "demonstration",
+        "产品实证演示",
+        "产品",
+        "品牌",
+        "广告"
+      ],
+      "content": {
+        "en": {
+          "title": "True product demonstration",
+          "goal": "Show what a real product can do and under which conditions.",
+          "materialPrerequisites": [
+            "Real screen or camera recording",
+            "Reproducible input, version and complete result",
+            "Classify proof, illustration and brand assets"
+          ],
+          "structure": [
+            "Task and starting state",
+            "Necessary operations",
+            "Visible result and limitations"
+          ],
+          "pictureRhythm": [
+            "Locate the whole interface before details",
+            "Allow recognition before action and reading after feedback",
+            "Label acceleration; retain the source"
+          ],
+          "audio": [
+            "Prioritize intelligible explanation",
+            "Retain real feedback sounds; do not invent success"
+          ],
+          "captions": [
+            "Use the actual UI names",
+            "Separate speech, action prompts and version conditions"
+          ],
+          "failureModes": [
+            "Invented UI or evidence",
+            "Missing required steps",
+            "Unreadable labels or unexplained waiting cuts"
+          ],
+          "acceptance": [
+            "A new viewer can name the function and prerequisites",
+            "Each claim points to a real result",
+            "Review sound alone, picture alone and complete AV"
+          ],
+          "fallback": [
+            "Only concept images: switch to a clearly labeled concept showcase",
+            "Missing result: request recording or narrow the claim"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "产品实证演示",
+          "goal": "让观众理解真实功能及其成立条件。",
+          "materialPrerequisites": [
+            "真实录屏或实拍",
+            "可复现输入、版本和完整结果",
+            "区分证据、示意与品牌素材"
+          ],
+          "structure": [
+            "任务与初始状态",
+            "必要操作",
+            "可见结果与限制"
+          ],
+          "pictureRhythm": [
+            "先整体定位再突出操作目标",
+            "操作前留识别时间，反馈后留阅读时间",
+            "加速须标注并保留原片"
+          ],
+          "audio": [
+            "人声解释优先",
+            "保留真实反馈声，不补造成功音效"
+          ],
+          "captions": [
+            "名称与实际界面一致",
+            "话语、动作提示和版本条件分层"
+          ],
+          "failureModes": [
+            "虚构界面或证据",
+            "删掉必要步骤",
+            "文字难读或等待被隐去"
+          ],
+          "acceptance": [
+            "陌生观众能说出功能与前提",
+            "每个卖点能找到真实结果",
+            "单听、静音看和完整声画分别检查"
+          ],
+          "fallback": [
+            "只有概念图：改为明确标注的概念展示",
+            "缺少结果：补录或缩小主张"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "showcase"
+      }
+    },
+    {
+      "id": "product-micro-story",
+      "purposes": [
+        "product-brand"
+      ],
+      "style": "causal-story",
+      "guideId": "showcase",
+      "sourceIds": [
+        "E01",
+        "E03",
+        "C04"
+      ],
+      "tags": [
+        "product",
+        "in",
+        "a",
+        "small",
+        "causal",
+        "story",
+        "产品场景微故事",
+        "产品",
+        "品牌",
+        "广告"
+      ],
+      "content": {
+        "en": {
+          "title": "Product in a small causal story",
+          "goal": "Make value visible through a task, obstacle, action and verified change.",
+          "materialPrerequisites": [
+            "Concrete task and visible obstacle",
+            "Product action and result",
+            "Label dramatization; never fake a customer testimonial"
+          ],
+          "structure": [
+            "Task",
+            "Obstacle",
+            "Product action",
+            "Observable change",
+            "Applicable audience"
+          ],
+          "pictureRhythm": [
+            "Establish person and space",
+            "Connect detail, action and reaction",
+            "Track object state and movement direction"
+          ],
+          "audio": [
+            "Retain environment and friction",
+            "Connect room tone across cuts",
+            "Let key operation sounds be heard"
+          ],
+          "captions": [
+            "Describe the change briefly",
+            "Comparable numbers require matching conditions and a source"
+          ],
+          "failureModes": [
+            "Magic resolution without action",
+            "Fabricated reactions",
+            "Transitions hiding missing causality"
+          ],
+          "acceptance": [
+            "Silent viewing explains the change",
+            "Removing the product action breaks the causal chain",
+            "Compare the result to the source conditions"
+          ],
+          "fallback": [
+            "Try an undecorated five-beat rough cut",
+            "Missing causal evidence: reshoot or change structure"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "产品场景微故事",
+          "goal": "用任务、阻碍、操作与真实变化呈现价值。",
+          "materialPrerequisites": [
+            "具体任务和可见阻碍",
+            "产品动作与真实结果",
+            "演绎须标注，不伪造客户证言"
+          ],
+          "structure": [
+            "任务",
+            "阻碍",
+            "产品动作",
+            "可见变化",
+            "适用人群"
+          ],
+          "pictureRhythm": [
+            "先交代人物与空间",
+            "连接细节、动作和反应",
+            "记录物件状态与运动方向"
+          ],
+          "audio": [
+            "保留环境与真实摩擦感",
+            "跨镜维持声底",
+            "关键操作声可听清"
+          ],
+          "captions": [
+            "短句说明变化",
+            "数字对比需同条件和来源"
+          ],
+          "failureModes": [
+            "问题魔法般消失",
+            "编造反应",
+            "用转场掩盖因果缺镜"
+          ],
+          "acceptance": [
+            "静音能理解变化",
+            "拿掉产品动作后因果断开",
+            "对照原片检查结果条件"
+          ],
+          "fallback": [
+            "先试无装饰的五段粗剪",
+            "缺因果证据：补拍或改结构"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "showcase"
+      }
+    },
+    {
+      "id": "brand-concept",
+      "purposes": [
+        "product-brand"
+      ],
+      "style": "concept-montage",
+      "guideId": "showcase",
+      "sourceIds": [
+        "E02",
+        "E05",
+        "E06"
+      ],
+      "tags": [
+        "brand",
+        "concept",
+        "and",
+        "emotion",
+        "品牌情绪概念",
+        "产品",
+        "品牌",
+        "广告"
+      ],
+      "content": {
+        "en": {
+          "title": "Brand concept and emotion",
+          "goal": "Develop a recognizable motif and brand memory.",
+          "materialPrerequisites": [
+            "One brand promise",
+            "A developing visual motif",
+            "Locked product appearance, logo and licensed assets"
+          ],
+          "structure": [
+            "Sensory invitation",
+            "Motif variations",
+            "Turn",
+            "Product or brand conclusion"
+          ],
+          "pictureRhythm": [
+            "Connect shape, color or action",
+            "Vary intensity and leave a readable hero shot",
+            "Keep movement grammar consistent"
+          ],
+          "audio": [
+            "Let entry, density, silence and resolution follow the emotional curve",
+            "Compare two low-cost rhythms"
+          ],
+          "captions": [
+            "Use editable brand text",
+            "Keep logo and product layers separate"
+          ],
+          "failureModes": [
+            "Random spectacle",
+            "Uniform intensity",
+            "Distorted packaging",
+            "Implied unsupported performance claims"
+          ],
+          "acceptance": [
+            "Blind viewers recall brand and intended feeling",
+            "Every shot develops the motif",
+            "Final card reads silently at target size"
+          ],
+          "fallback": [
+            "Replace unreliable fine text with deterministic editable layers",
+            "Remove redundant beauty shots"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "品牌情绪概念",
+          "goal": "发展视觉母题并留下品牌记忆。",
+          "materialPrerequisites": [
+            "一句品牌承诺",
+            "能够发展的视觉母题",
+            "锁定产品外观、标志与合法素材"
+          ],
+          "structure": [
+            "感官引子",
+            "母题变化",
+            "转折",
+            "产品或品牌结论"
+          ],
+          "pictureRhythm": [
+            "用形态、颜色或动作连接",
+            "强度有变化，核心产品镜头可读",
+            "运动语法保持一致"
+          ],
+          "audio": [
+            "进入、密度、停顿和收束对应情绪曲线",
+            "比较两种低成本节奏"
+          ],
+          "captions": [
+            "品牌文字使用可编辑图层",
+            "标志与产品分层"
+          ],
+          "failureModes": [
+            "随机炫技",
+            "强度始终不变",
+            "包装变形",
+            "暗示无证实的性能"
+          ],
+          "acceptance": [
+            "盲看后记住品牌与情绪",
+            "每镜发展母题",
+            "目标尺寸静音能读落版"
+          ],
+          "fallback": [
+            "精确小字使用确定性图层",
+            "删除功能重复的唯美镜头"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "showcase"
+      }
+    },
+    {
+      "id": "faithful-conversation",
+      "purposes": [
+        "dialogue"
+      ],
+      "style": "conversation",
+      "guideId": "explainer",
+      "sourceIds": [
+        "P01",
+        "P02"
+      ],
+      "tags": [
+        "faithful",
+        "long",
+        "conversation",
+        "忠实长谈",
+        "播客",
+        "访谈",
+        "对话"
+      ],
+      "content": {
+        "en": {
+          "title": "Faithful long conversation",
+          "goal": "Preserve thought, conditions and real conversational relationships.",
+          "materialPrerequisites": [
+            "Complete recording and context",
+            "Verified speaker identities",
+            "Synchronized angles if available, not required"
+          ],
+          "structure": [
+            "Question progression",
+            "Examples and argument",
+            "Disagreement",
+            "Conditions and limits"
+          ],
+          "pictureRhythm": [
+            "Cut on thought or meaningful turn",
+            "Use reactions from the same synchronized moment",
+            "Retain meaningful silence"
+          ],
+          "audio": [
+            "Check breaths and word endings at normal speed",
+            "Keep room tone",
+            "Music is optional and sparse"
+          ],
+          "captions": [
+            "Correct names, terms, negations and units",
+            "Break captions semantically"
+          ],
+          "failureModes": [
+            "Deleting all pauses",
+            "Remote sentence splicing changes stance",
+            "Borrowed reaction changes attitude"
+          ],
+          "acceptance": [
+            "Compare meaning to the full source",
+            "Review each join and complete chapters with sound",
+            "Preserve qualifiers and natural interaction"
+          ],
+          "fallback": [
+            "Without multicam use a stable shot or honest jump cut",
+            "ASR is a candidate timing aid, verify by listening"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "忠实长谈",
+          "goal": "保留完整思想、条件和真实交流关系。",
+          "materialPrerequisites": [
+            "完整录音与上下文",
+            "核对说话者身份",
+            "有同步机位可用，但非必要条件"
+          ],
+          "structure": [
+            "问题递进",
+            "案例与论据",
+            "争议",
+            "条件与限制"
+          ],
+          "pictureRhythm": [
+            "按完整思想或有意义的话轮切",
+            "反应只能用同一时刻同步画面",
+            "保留有意义的静默"
+          ],
+          "audio": [
+            "正常速度检查呼吸和词尾",
+            "保持声底",
+            "音乐可少用或不用"
+          ],
+          "captions": [
+            "校正人名、术语、否定与单位",
+            "依语义断句"
+          ],
+          "failureModes": [
+            "删除全部停顿",
+            "拼远隔句子改变立场",
+            "异时反应改变关系"
+          ],
+          "acceptance": [
+            "对照完整原片核原意",
+            "逐剪口及完整章节带声检查",
+            "保留限定条件和自然互动"
+          ],
+          "fallback": [
+            "无多机位时用稳定镜头或可信跳切",
+            "ASR仅提供候选时间，剪点须试听"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "explainer"
+      }
+    },
+    {
+      "id": "standalone-highlight",
+      "purposes": [
+        "dialogue",
+        "highlights"
+      ],
+      "style": "conversation",
+      "guideId": "explainer",
+      "sourceIds": [
+        "P01",
+        "P02",
+        "S01",
+        "S02"
+      ],
+      "tags": [
+        "self-contained",
+        "talk",
+        "or",
+        "stream",
+        "highlight",
+        "自足观点高光",
+        "播客",
+        "访谈",
+        "对话",
+        "演讲",
+        "直播",
+        "高光"
+      ],
+      "content": {
+        "en": {
+          "title": "Self-contained talk or stream highlight",
+          "goal": "Deliver one complete idea with context and a truthful promise.",
+          "materialPrerequisites": [
+            "Trustworthy full version",
+            "Candidate in/out plus preceding and following context",
+            "Speaker and supporting visual evidence"
+          ],
+          "structure": [
+            "Question or promise",
+            "Complete claim",
+            "Essential support",
+            "Payoff and boundary"
+          ],
+          "pictureRhythm": [
+            "Retain referents, negation and causal conditions",
+            "Reframe each passage for vertical delivery",
+            "Keep event setup and outcome"
+          ],
+          "audio": [
+            "Prioritize speech",
+            "Review joins normally",
+            "Do not add controversy with impact sounds"
+          ],
+          "captions": [
+            "Faithful captions distinct from editorial explanations",
+            "The title must be fulfilled in the clip"
+          ],
+          "failureModes": [
+            "Isolated quote reverses position",
+            "Blind center crop",
+            "Title stronger than evidence"
+          ],
+          "acceptance": [
+            "First-time viewer can explain the claim",
+            "Restoring source context does not overturn it",
+            "Inspect phone framing and complete AV"
+          ],
+          "fallback": [
+            "Complex idea: extend or split into a series",
+            "Route performance streams to MV; event streams to event recap"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "自足观点高光",
+          "goal": "用必要语境兑现一个完整观点。",
+          "materialPrerequisites": [
+            "可信长版",
+            "候选入出点及前后语境",
+            "说话者与视觉证据"
+          ],
+          "structure": [
+            "问题或承诺",
+            "完整论点",
+            "关键依据",
+            "兑现与边界"
+          ],
+          "pictureRhythm": [
+            "保留指代、否定和因果条件",
+            "竖屏逐段重构主体",
+            "事件保留铺垫与结果"
+          ],
+          "audio": [
+            "语音优先",
+            "正常速度复听剪口",
+            "不用冲击音制造争议"
+          ],
+          "captions": [
+            "忠实字幕与编辑补充分开",
+            "标题必须在片中兑现"
+          ],
+          "failureModes": [
+            "孤立引语反转立场",
+            "一刀裁中间",
+            "标题强于证据"
+          ],
+          "acceptance": [
+            "首次观看者能说出观点",
+            "恢复原片语境不推翻立场",
+            "手机构图与完整声画检查"
+          ],
+          "fallback": [
+            "复杂观点延长或拆系列",
+            "表演直播转MV，事件直播转活动回顾"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "explainer"
+      }
+    },
+    {
+      "id": "mechanism-explainer",
+      "purposes": [
+        "knowledge"
+      ],
+      "style": "explanation",
+      "guideId": "explainer",
+      "sourceIds": [
+        "K01",
+        "P03",
+        "P04"
+      ],
+      "tags": [
+        "mechanism",
+        "and",
+        "concept",
+        "explanation",
+        "机制科普与概念解释",
+        "知识",
+        "科普",
+        "讲解"
+      ],
+      "content": {
+        "en": {
+          "title": "Mechanism and concept explanation",
+          "goal": "Build a correct mental model and transferable understanding.",
+          "materialPrerequisites": [
+            "Reliable claim/source ledger",
+            "Audience prior knowledge",
+            "Diagrams, experiments or data with uncertainty"
+          ],
+          "structure": [
+            "Question",
+            "Concrete example",
+            "Mechanism or derivation",
+            "Counterexample and limits",
+            "Return to question"
+          ],
+          "pictureRhythm": [
+            "Visual changes must change understanding",
+            "Align the highlighted variable with explanation",
+            "Keep symbols and colors stable"
+          ],
+          "audio": [
+            "Reduce density during reasoning",
+            "Use sound for state changes only",
+            "Check audio logic, silent diagrams, then synchronization"
+          ],
+          "captions": [
+            "Labels explain structure; captions carry speech",
+            "Include units, scales and comparable conditions"
+          ],
+          "failureModes": [
+            "Pretty animation before logic",
+            "Correlation presented as cause",
+            "Distorted scales or invented experiments"
+          ],
+          "acceptance": [
+            "New viewers can explain the relation and its limits",
+            "Use a transfer question",
+            "Expert checks facts and diagrams separately"
+          ],
+          "fallback": [
+            "Use simple static diagrams when animation obscures reasoning",
+            "Unknown facts stay explicitly unknown"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "机制科普与概念解释",
+          "goal": "形成正确认知并能迁移理解。",
+          "materialPrerequisites": [
+            "可靠主张与来源台账",
+            "受众已有知识",
+            "带不确定性说明的图表、实验或数据"
+          ],
+          "structure": [
+            "问题",
+            "具体例子",
+            "机制或推导",
+            "反例与边界",
+            "回扣问题"
+          ],
+          "pictureRhythm": [
+            "画面变化必须改变理解",
+            "讲解与变量突出同步",
+            "符号与颜色稳定"
+          ],
+          "audio": [
+            "推理段降低声音密度",
+            "音效只强调状态改变",
+            "先听逻辑、静音看图，再合看同步"
+          ],
+          "captions": [
+            "标签说明结构，字幕承载话语",
+            "保留单位、尺度和比较条件"
+          ],
+          "failureModes": [
+            "先找漂亮动画再编解释",
+            "相关冒充因果",
+            "扭曲坐标或虚构实验"
+          ],
+          "acceptance": [
+            "新观众能解释关系与边界",
+            "用迁移问题检验",
+            "事实与图示另由专家核查"
+          ],
+          "fallback": [
+            "动画妨碍推理时改用静图",
+            "未知信息明确标未知"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "explainer"
+      }
+    },
+    {
+      "id": "task-tutorial",
+      "purposes": [
+        "tutorial"
+      ],
+      "style": "demonstration",
+      "guideId": "explainer",
+      "sourceIds": [
+        "K02"
+      ],
+      "tags": [
+        "reproducible",
+        "task",
+        "tutorial",
+        "可复现操作教程",
+        "操作",
+        "教程",
+        "培训"
+      ],
+      "content": {
+        "en": {
+          "title": "Reproducible task tutorial",
+          "goal": "Enable the viewer to repeat a real task from a known starting state.",
+          "materialPrerequisites": [
+            "Real operation recording",
+            "Version, permissions and initial state",
+            "Successful result and common failure/recovery"
+          ],
+          "structure": [
+            "Result preview",
+            "Prerequisites",
+            "Action and feedback per step",
+            "Verification",
+            "Recovery"
+          ],
+          "pictureRhythm": [
+            "Locate target before clicking",
+            "Wait for actual feedback",
+            "Do not crop away required state"
+          ],
+          "audio": [
+            "Narration describes the current action",
+            "Retain meaningful error and feedback sounds"
+          ],
+          "captions": [
+            "Exact UI names, shortcuts and parameters",
+            "Separate instruction from speech",
+            "Allow reading time"
+          ],
+          "failureModes": [
+            "Generated UI used as proof",
+            "Required state transition omitted",
+            "Private account data exposed"
+          ],
+          "acceptance": [
+            "An unfamiliar viewer can reproduce from the declared start",
+            "Log the step where reproduction fails",
+            "Verify small text at actual target size"
+          ],
+          "fallback": [
+            "Record missing steps rather than fabricate them",
+            "Dense UI: retain landscape or redesign steps instead of blind vertical crop"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "可复现操作教程",
+          "goal": "让观众从明确起点重复完成真实任务。",
+          "materialPrerequisites": [
+            "真实操作录制",
+            "版本、权限与初始状态",
+            "成功结果及常见失败恢复"
+          ],
+          "structure": [
+            "成果预览",
+            "前提",
+            "逐步动作与反馈",
+            "结果验证",
+            "错误恢复"
+          ],
+          "pictureRhythm": [
+            "先找到目标再点击",
+            "等待真实反馈",
+            "不裁掉必要状态"
+          ],
+          "audio": [
+            "旁白描述当前动作",
+            "保留有意义的报错和反馈声"
+          ],
+          "captions": [
+            "界面名、快捷键与参数准确",
+            "操作提示与原话分层",
+            "留阅读时间"
+          ],
+          "failureModes": [
+            "生成界面冒充证据",
+            "删掉必要状态变化",
+            "暴露私人账号信息"
+          ],
+          "acceptance": [
+            "新观众从声明起点照做成功",
+            "记录复现失败步骤",
+            "目标尺寸核小字"
+          ],
+          "fallback": [
+            "缺步骤就补录，不编造",
+            "密集界面保留横屏或重做步骤，勿直接裁竖屏"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "explainer"
+      }
+    },
+    {
+      "id": "travel-journey",
+      "purposes": [
+        "travel"
+      ],
+      "style": "causal-story",
+      "guideId": "documentary",
+      "sourceIds": [
+        "C01",
+        "T03"
+      ],
+      "tags": [
+        "personal",
+        "travel",
+        "journey",
+        "人物旅记",
+        "旅游",
+        "旅行",
+        "风光"
+      ],
+      "content": {
+        "en": {
+          "title": "Personal travel journey",
+          "goal": "Follow a real discovery through actions and responses.",
+          "materialPrerequisites": [
+            "True spoken notes or diary",
+            "Departure, action, reaction and outcome",
+            "Location sound and verified place names"
+          ],
+          "structure": [
+            "Intent",
+            "What happened",
+            "Response",
+            "What changed"
+          ],
+          "pictureRhythm": [
+            "Use A-roll as the spine",
+            "B-roll explains the spoken object",
+            "Compress repetition while retaining action outcomes"
+          ],
+          "audio": [
+            "Leave windows for local sound",
+            "Ducking supports dialogue",
+            "Verify ASR cut points against the voice"
+          ],
+          "captions": [
+            "Faithful speech captions",
+            "Location/date cards distinct from dialogue"
+          ],
+          "failureModes": [
+            "Invented conflict from scenery",
+            "Deleted pauses remove feeling",
+            "B-roll unrelated to narration"
+          ],
+          "acceptance": [
+            "Viewer can name the goal and change",
+            "Movements and full sentences remain understandable",
+            "Compare rough cut to original speech"
+          ],
+          "fallback": [
+            "Only scenery: choose atmosphere essay",
+            "Missing shot: use an honest photo/map or disclose the gap"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "人物旅记",
+          "goal": "跟随真实行动与反应经历一次发现。",
+          "materialPrerequisites": [
+            "真实口述或旅行笔记",
+            "出发、行动、反应与结果",
+            "现场声和准确地名"
+          ],
+          "structure": [
+            "想做什么",
+            "实际发生什么",
+            "如何应对",
+            "留下什么变化"
+          ],
+          "pictureRhythm": [
+            "A-roll建立骨架",
+            "B-roll解释正在说的对象",
+            "压缩重复但保留动作结果"
+          ],
+          "audio": [
+            "给当地声音留窗口",
+            "配乐在人声下退让",
+            "对照原声校ASR剪点"
+          ],
+          "captions": [
+            "原话字幕忠实",
+            "地点日期卡与对白分层"
+          ],
+          "failureModes": [
+            "只有风景却编冲突",
+            "连删停顿抹去情绪",
+            "画面与讲解无关"
+          ],
+          "acceptance": [
+            "观众能说出人物目标和变化",
+            "移动与完整句可理解",
+            "粗剪对照原声"
+          ],
+          "fallback": [
+            "只有风景改为氛围随笔",
+            "缺镜可用真实照片地图或承认未拍到"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "documentary"
+      }
+    },
+    {
+      "id": "travel-atmosphere",
+      "purposes": [
+        "travel"
+      ],
+      "style": "sensory-essay",
+      "guideId": "documentary",
+      "sourceIds": [
+        "T01",
+        "T02"
+      ],
+      "tags": [
+        "place",
+        "and",
+        "atmosphere",
+        "essay",
+        "氛围风光随笔",
+        "旅游",
+        "旅行",
+        "风光"
+      ],
+      "content": {
+        "en": {
+          "title": "Place and atmosphere essay",
+          "goal": "Develop the sensory character of a place without invented events.",
+          "materialPrerequisites": [
+            "Wide, medium and detail coverage",
+            "Changing light, movement or natural events",
+            "Licensed music and local sound"
+          ],
+          "structure": [
+            "Invitation",
+            "Development or contrast",
+            "Peak",
+            "Aftertaste"
+          ],
+          "pictureRhythm": [
+            "Connect actions, shapes and sound",
+            "Mix hold lengths",
+            "Slow motion only where expressive; allow still photographs"
+          ],
+          "audio": [
+            "Use local ambience as connective tissue",
+            "Check musical sections, not every beat",
+            "Recheck edits when replacing temporary music"
+          ],
+          "captions": [
+            "Few accurate place labels",
+            "Do not label mixed locations as one site"
+          ],
+          "failureModes": [
+            "Uniform slow motion",
+            "Random beauty montage",
+            "Cutting actions only to hit a beat",
+            "Borrowed ambience implies a false place"
+          ],
+          "acceptance": [
+            "Pictures have development with music muted",
+            "No accidental sound-bed breaks",
+            "Each shot adds information or feeling"
+          ],
+          "fallback": [
+            "Repetitive aerials: shorten the essay",
+            "Add practical claims only after adopting route-guide fact checks"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "氛围风光随笔",
+          "goal": "发展地方感官特征，不编造事件。",
+          "materialPrerequisites": [
+            "远中近与细节覆盖",
+            "光线、运动或自然事件变化",
+            "合法音乐和现场声"
+          ],
+          "structure": [
+            "引入",
+            "发展或反差",
+            "峰值",
+            "余韵"
+          ],
+          "pictureRhythm": [
+            "以动作、构图或声音连接",
+            "长短停留交替",
+            "慢动作要有作用，照片可静止"
+          ],
+          "audio": [
+            "环境声连接段落",
+            "看乐段而非每拍切",
+            "更换临时音乐后重核剪点"
+          ],
+          "captions": [
+            "少量准确地点标识",
+            "不同地区勿混标同地"
+          ],
+          "failureModes": [
+            "全片慢动作",
+            "随机美景堆叠",
+            "为卡点截动作",
+            "异地声暗示错误地点"
+          ],
+          "acceptance": [
+            "关音乐仍有视觉发展",
+            "声底无意外断裂",
+            "每镜增加信息或情绪"
+          ],
+          "fallback": [
+            "航拍重复则缩短随笔",
+            "加入实用主张前转入攻略核查"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "documentary"
+      }
+    },
+    {
+      "id": "travel-route",
+      "purposes": [
+        "travel"
+      ],
+      "style": "fact-chain",
+      "guideId": "documentary",
+      "sourceIds": [
+        "T03",
+        "T04"
+      ],
+      "tags": [
+        "practical",
+        "route",
+        "guide",
+        "实用路线攻略",
+        "旅游",
+        "旅行",
+        "风光"
+      ],
+      "content": {
+        "en": {
+          "title": "Practical route guide",
+          "goal": "Help viewers decide and follow a verifiable route.",
+          "materialPrerequisites": [
+            "Ordered stops, transport and signs",
+            "Time/price/restriction sources with check dates",
+            "Clear unknowns and alternatives"
+          ],
+          "structure": [
+            "Audience and constraints",
+            "Route overview",
+            "Stops and decisions",
+            "Weather/time alternatives"
+          ],
+          "pictureRhythm": [
+            "Locate on map before site detail",
+            "Align sign and instruction",
+            "Hold complex decisions longer"
+          ],
+          "audio": [
+            "Low interference under instructions",
+            "Retain some scenic and location-sound breathing room"
+          ],
+          "captions": [
+            "Separate facts from dialogue",
+            "Readable units, dates, map legend and limitations"
+          ],
+          "failureModes": [
+            "Old prices presented as current",
+            "Invented junctions",
+            "One lucky connection promised to everyone"
+          ],
+          "acceptance": [
+            "Viewer can state start, end, order and limits",
+            "Each number traces to date and source",
+            "Phone cards are readable"
+          ],
+          "fallback": [
+            "Unknown schedules remain unknown",
+            "Maps/AI diagrams can explain but cannot prove current access"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "实用路线攻略",
+          "goal": "帮助观众决策并跟随可核查路线。",
+          "materialPrerequisites": [
+            "站点顺序、交通与路标",
+            "费用时间限制的来源与核查日期",
+            "未知项及替代方案"
+          ],
+          "structure": [
+            "受众与约束",
+            "路线总览",
+            "站点与取舍",
+            "天气时间备选"
+          ],
+          "pictureRhythm": [
+            "地图先定位再到现场",
+            "路标与指令同步",
+            "困难决策多停留"
+          ],
+          "audio": [
+            "指令段降低干扰",
+            "保留风景和现场声呼吸段"
+          ],
+          "captions": [
+            "实用信息与对白分层",
+            "单位日期图例限制可读"
+          ],
+          "failureModes": [
+            "旧价写当前价",
+            "编造路口",
+            "幸运转车变普遍保证"
+          ],
+          "acceptance": [
+            "观众可复述起终点、顺序与限制",
+            "数字可追日期来源",
+            "手机卡片可读"
+          ],
+          "fallback": [
+            "班次未知就标未知",
+            "地图或AI示意可解释，不能证明当前通行"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "documentary"
+      }
+    },
+    {
+      "id": "factual-story",
+      "purposes": [
+        "news-history"
+      ],
+      "style": "fact-chain",
+      "guideId": "documentary",
+      "sourceIds": [
+        "K03",
+        "P03"
+      ],
+      "tags": [
+        "traceable",
+        "news",
+        "or",
+        "historical",
+        "account",
+        "可追溯新闻历史事实链",
+        "新闻",
+        "历史",
+        "事实"
+      ],
+      "content": {
+        "en": {
+          "title": "Traceable news or historical account",
+          "goal": "Explain events, attribution and uncertainty accurately.",
+          "materialPrerequisites": [
+            "Checked sources with times, places and rights",
+            "Claim status ledger",
+            "Distinguish archives, stock, reconstruction and current footage"
+          ],
+          "structure": [
+            "Timeline",
+            "Claims and evidence",
+            "Attributed accounts",
+            "Unknowns",
+            "Consequences or next step"
+          ],
+          "pictureRhythm": [
+            "Each shot supports a specific fact",
+            "Allow readable documents and maps",
+            "Label archival time/place and reconstruction"
+          ],
+          "audio": [
+            "Prioritize actual interviews and site sound",
+            "Music cannot imply guilt",
+            "Synthetic narration must not impersonate testimony"
+          ],
+          "captions": [
+            "Accurate dates, identities and attribution",
+            "Distinguish quote, translation, summary and allegation"
+          ],
+          "failureModes": [
+            "Stock passed as current site",
+            "Emotional juxtaposition invents causality",
+            "Narration treated as proof"
+          ],
+          "acceptance": [
+            "Every major claim traces to a source",
+            "Known and unknown remain distinct",
+            "Recheck timely facts before release"
+          ],
+          "fallback": [
+            "Conflicting sources: attribute the disagreement",
+            "Missing proof: narrow claim, never manufacture evidence"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "可追溯新闻历史事实链",
+          "goal": "准确说明事件、归因和未知。",
+          "materialPrerequisites": [
+            "已核资料的时间地点与权利",
+            "主张状态台账",
+            "档案、库存、重构与本次现场分清"
+          ],
+          "structure": [
+            "时间线",
+            "主张与证据",
+            "相关说法归因",
+            "未知",
+            "影响或下一步"
+          ],
+          "pictureRhythm": [
+            "每镜支持具体事实",
+            "文件地图可停留",
+            "档案时间地点和重构须标注"
+          ],
+          "audio": [
+            "真实采访和现场声优先",
+            "配乐不暗示有罪",
+            "合成解说不冒充证言"
+          ],
+          "captions": [
+            "日期身份归因准确",
+            "引文、翻译、摘要和指控分清"
+          ],
+          "failureModes": [
+            "库存冒充本次现场",
+            "情绪拼接造因果",
+            "旁白当证据"
+          ],
+          "acceptance": [
+            "重要主张均可追源",
+            "已知未知分清",
+            "发布前复核时效"
+          ],
+          "fallback": [
+            "来源冲突则呈现归因",
+            "缺证据缩小主张，不制造证据"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "documentary"
+      }
+    },
+    {
+      "id": "observational-portrait",
+      "purposes": [
+        "portrait"
+      ],
+      "style": "observation",
+      "guideId": "documentary",
+      "sourceIds": [
+        "P03",
+        "P04",
+        "T03"
+      ],
+      "tags": [
+        "observational",
+        "portrait",
+        "真实人物观察纪实",
+        "人物",
+        "纪录",
+        "纪实"
+      ],
+      "content": {
+        "en": {
+          "title": "Observational portrait",
+          "goal": "Understand a real person and the complexity of their situation.",
+          "materialPrerequisites": [
+            "Real interviews, action and archives",
+            "Verified experiences",
+            "Consent and publication scope for all involved"
+          ],
+          "structure": [
+            "Concrete situation",
+            "Desire or difficulty",
+            "Actual choices and consequences",
+            "An honest ending"
+          ],
+          "pictureRhythm": [
+            "Alternate action and actual words",
+            "Keep observation and significant silence",
+            "Distinguish memory, archive and present"
+          ],
+          "audio": [
+            "Natural sound locates action",
+            "Narration must not repeat everything",
+            "Music may leave complexity unresolved"
+          ],
+          "captions": [
+            "Verified identity and relationships",
+            "Attribute remembered or disputed statements"
+          ],
+          "failureModes": [
+            "Borrowed crying/smiling reactions",
+            "Invented crisis",
+            "Narration adds meaning absent from interview"
+          ],
+          "acceptance": [
+            "Viewer can explain the situation and its complexity",
+            "Quotes and facts trace to source",
+            "Privacy and relationships reviewed separately"
+          ],
+          "fallback": [
+            "No dramatic change: show meaningful routine",
+            "Do not infer motives automatically"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "真实人物观察纪实",
+          "goal": "理解真实处境及其复杂性。",
+          "materialPrerequisites": [
+            "真实采访、行动和档案",
+            "可核经历",
+            "所有相关人物的同意与公开范围"
+          ],
+          "structure": [
+            "具体处境",
+            "目标或困难",
+            "真实选择与后果",
+            "诚实的结尾"
+          ],
+          "pictureRhythm": [
+            "行动与原话互补",
+            "保留观察和重要静默",
+            "回忆、档案和现在分清"
+          ],
+          "audio": [
+            "自然声定位行动",
+            "旁白不重复采访",
+            "音乐允许复杂情绪"
+          ],
+          "captions": [
+            "核对身份关系",
+            "回忆与争议陈述须归因"
+          ],
+          "failureModes": [
+            "异时哭笑反应",
+            "编造危机",
+            "旁白补造采访没有的意思"
+          ],
+          "acceptance": [
+            "观众能解释处境及复杂性",
+            "原话事实可追源",
+            "隐私关系单独审查"
+          ],
+          "fallback": [
+            "没有剧变也可呈现有意义日常",
+            "不自动推定人物动机"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "documentary"
+      }
+    },
+    {
+      "id": "fiction-scene",
+      "purposes": [
+        "fiction"
+      ],
+      "style": "causal-story",
+      "guideId": "narrative",
+      "sourceIds": [
+        "E01",
+        "E03",
+        "C03",
+        "C04"
+      ],
+      "tags": [
+        "character",
+        "choice",
+        "and",
+        "fictional",
+        "scene",
+        "虚构人物选择与剧情场景",
+        "剧情",
+        "虚构",
+        "角色"
+      ],
+      "content": {
+        "en": {
+          "title": "Character choice and fictional scene",
+          "goal": "Make action, consequence and emotion understandable.",
+          "materialPrerequisites": [
+            "Story intention and dialogue",
+            "Character/prop states",
+            "Coverage of the hardest exchange; declare fiction"
+          ],
+          "structure": [
+            "Situation",
+            "Disturbance",
+            "Choice",
+            "Consequence",
+            "Aftertaste"
+          ],
+          "pictureRhythm": [
+            "Establish space then action/reaction",
+            "Record eyelines, direction and prop state",
+            "Intentional axis changes need orientation clues"
+          ],
+          "audio": [
+            "Keep acoustic space across cuts",
+            "Dialogue, object sound and music have separate roles",
+            "Silence can carry hesitation"
+          ],
+          "captions": [
+            "Semantic reading time",
+            "Use deterministic layers for exact clocks, dates and text"
+          ],
+          "failureModes": [
+            "Similar face mistaken for continuity",
+            "Action has no result",
+            "Expensive unused shot retained for sunk cost"
+          ],
+          "acceptance": [
+            "New viewers can explain goal and change",
+            "Action and sound across cuts have a reason",
+            "Watch the hardest exchange with sound"
+          ],
+          "fallback": [
+            "Reduce scene/characters if coverage is missing",
+            "Try reordering or local composition before regeneration"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "虚构人物选择与剧情场景",
+          "goal": "使行动、后果和情绪可理解。",
+          "materialPrerequisites": [
+            "故事意图与对白",
+            "角色道具状态",
+            "最难交流所需覆盖，并声明虚构"
+          ],
+          "structure": [
+            "处境",
+            "扰动",
+            "选择",
+            "后果",
+            "余韵"
+          ],
+          "pictureRhythm": [
+            "先空间后动作反应",
+            "记录视线方向和道具",
+            "有意跨轴需重新定位线索"
+          ],
+          "audio": [
+            "跨镜维持声学空间",
+            "对白物件声音乐各有作用",
+            "静默承载犹豫"
+          ],
+          "captions": [
+            "按语义与阅读时间组织",
+            "精确时钟日期文字用确定性图层"
+          ],
+          "failureModes": [
+            "脸相似就判连续",
+            "动作无结果",
+            "因生成昂贵而留无用镜头"
+          ],
+          "acceptance": [
+            "新观众能说出目标与变化",
+            "跨镜动作和声音有解释",
+            "核心交流带声观看"
+          ],
+          "fallback": [
+            "缺覆盖则缩小场景或角色数",
+            "先尝试重排和局部合成再考虑补生成"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "narrative"
+      }
+    },
+    {
+      "id": "mv-performance",
+      "purposes": [
+        "music"
+      ],
+      "style": "performance",
+      "guideId": "music-video",
+      "sourceIds": [
+        "E05",
+        "E06",
+        "E07",
+        "C06"
+      ],
+      "tags": [
+        "performance-led",
+        "music",
+        "video",
+        "演出型MV",
+        "音乐",
+        "歌曲",
+        "MV"
+      ],
+      "content": {
+        "en": {
+          "title": "Performance-led music video",
+          "goal": "Develop music through one dominant visual strategy.",
+          "materialPrerequisites": [
+            "Licensed complete song and performer image",
+            "Actual musical sections",
+            "Usable takes, movement and declared fictional/real status"
+          ],
+          "structure": [
+            "Identity and performance anchor",
+            "Phrase development",
+            "Performance peak",
+            "Resolution"
+          ],
+          "pictureRhythm": [
+            "Cut with phrase, breath or action, not every beat",
+            "Record usable in/out states",
+            "Vary density across musical sections"
+          ],
+          "audio": [
+            "Protect the main song",
+            "Do not cover vocals with effects",
+            "Listen to the complete mix after picture changes"
+          ],
+          "captions": [
+            "Restrained readable lyrics if needed",
+            "Do not illustrate every lyric literally"
+          ],
+          "failureModes": [
+            "Uniform intensity",
+            "Random motif sequence",
+            "Unconvincing lip sync",
+            "Missing action results"
+          ],
+          "acceptance": [
+            "Remember the performer",
+            "Credible singing and movement",
+            "Compare two low-cost rhythms then inspect the full AV"
+          ],
+          "fallback": [
+            "Unreliable lip sync: use credible body movement, back views or declared stylization",
+            "Change the shot plan before endless regeneration"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "演出型MV",
+          "goal": "选择一种主导视觉策略发展歌曲。",
+          "materialPrerequisites": [
+            "歌曲与表演者形象的合法使用",
+            "实际乐段",
+            "可用take、动作和真实虚构属性"
+          ],
+          "structure": [
+            "表演者锚点",
+            "乐句发展",
+            "表演峰值",
+            "收束"
+          ],
+          "pictureRhythm": [
+            "按乐句呼吸或动作切，不是逢拍切",
+            "记录有效入出状态",
+            "乐段之间改变密度"
+          ],
+          "audio": [
+            "保护主歌曲",
+            "音效不盖主唱",
+            "改画面后完整复听"
+          ],
+          "captions": [
+            "如需歌词则节制且可读",
+            "不逐字图解歌词"
+          ],
+          "failureModes": [
+            "强度不变",
+            "母题随机排列",
+            "口型不可信",
+            "动作缺结果"
+          ],
+          "acceptance": [
+            "记住表演者",
+            "演唱和动作可信",
+            "比较两种低成本节奏，再完整声画审查"
+          ],
+          "fallback": [
+            "口型不可靠则改可信身体动作、背影或明确风格化",
+            "先改镜头方案，不无限重生成"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "music-video"
+      }
+    },
+    {
+      "id": "mv-concept",
+      "purposes": [
+        "music"
+      ],
+      "style": "concept-montage",
+      "guideId": "music-video",
+      "sourceIds": [
+        "E05",
+        "E06",
+        "E07",
+        "C06"
+      ],
+      "tags": [
+        "concept",
+        "association",
+        "music",
+        "video",
+        "概念联想型MV",
+        "音乐",
+        "歌曲",
+        "MV"
+      ],
+      "content": {
+        "en": {
+          "title": "Concept association music video",
+          "goal": "Develop music through one dominant visual strategy.",
+          "materialPrerequisites": [
+            "Licensed complete song and performer image",
+            "Actual musical sections",
+            "Usable takes, movement and declared fictional/real status"
+          ],
+          "structure": [
+            "Motif introduction",
+            "Variation",
+            "Chorus intensification",
+            "Bridge contrast",
+            "Return"
+          ],
+          "pictureRhythm": [
+            "Cut with phrase, breath or action, not every beat",
+            "Record usable in/out states",
+            "Vary density across musical sections"
+          ],
+          "audio": [
+            "Protect the main song",
+            "Do not cover vocals with effects",
+            "Listen to the complete mix after picture changes"
+          ],
+          "captions": [
+            "Restrained readable lyrics if needed",
+            "Do not illustrate every lyric literally"
+          ],
+          "failureModes": [
+            "Uniform intensity",
+            "Random motif sequence",
+            "Unconvincing lip sync",
+            "Missing action results"
+          ],
+          "acceptance": [
+            "Explain motif development",
+            "Repetition adds meaning",
+            "Compare two low-cost rhythms then inspect the full AV"
+          ],
+          "fallback": [
+            "Unreliable lip sync: use credible body movement, back views or declared stylization",
+            "Change the shot plan before endless regeneration"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "概念联想型MV",
+          "goal": "选择一种主导视觉策略发展歌曲。",
+          "materialPrerequisites": [
+            "歌曲与表演者形象的合法使用",
+            "实际乐段",
+            "可用take、动作和真实虚构属性"
+          ],
+          "structure": [
+            "母题引入",
+            "变化",
+            "副歌升级",
+            "桥段反差",
+            "回归"
+          ],
+          "pictureRhythm": [
+            "按乐句呼吸或动作切，不是逢拍切",
+            "记录有效入出状态",
+            "乐段之间改变密度"
+          ],
+          "audio": [
+            "保护主歌曲",
+            "音效不盖主唱",
+            "改画面后完整复听"
+          ],
+          "captions": [
+            "如需歌词则节制且可读",
+            "不逐字图解歌词"
+          ],
+          "failureModes": [
+            "强度不变",
+            "母题随机排列",
+            "口型不可信",
+            "动作缺结果"
+          ],
+          "acceptance": [
+            "能解释母题发展",
+            "重复带来新意义",
+            "比较两种低成本节奏，再完整声画审查"
+          ],
+          "fallback": [
+            "口型不可靠则改可信身体动作、背影或明确风格化",
+            "先改镜头方案，不无限重生成"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "music-video"
+      }
+    },
+    {
+      "id": "mv-story",
+      "purposes": [
+        "music"
+      ],
+      "style": "causal-story",
+      "guideId": "music-video",
+      "sourceIds": [
+        "E05",
+        "E06",
+        "E07",
+        "C06"
+      ],
+      "tags": [
+        "micro-narrative",
+        "music",
+        "video",
+        "微叙事型MV",
+        "音乐",
+        "歌曲",
+        "MV"
+      ],
+      "content": {
+        "en": {
+          "title": "Micro-narrative music video",
+          "goal": "Develop music through one dominant visual strategy.",
+          "materialPrerequisites": [
+            "Licensed complete song and performer image",
+            "Actual musical sections",
+            "Usable takes, movement and declared fictional/real status"
+          ],
+          "structure": [
+            "Desire",
+            "Obstacle",
+            "Choice across musical sections",
+            "Consequence"
+          ],
+          "pictureRhythm": [
+            "Cut with phrase, breath or action, not every beat",
+            "Record usable in/out states",
+            "Vary density across musical sections"
+          ],
+          "audio": [
+            "Protect the main song",
+            "Do not cover vocals with effects",
+            "Listen to the complete mix after picture changes"
+          ],
+          "captions": [
+            "Restrained readable lyrics if needed",
+            "Do not illustrate every lyric literally"
+          ],
+          "failureModes": [
+            "Uniform intensity",
+            "Random motif sequence",
+            "Unconvincing lip sync",
+            "Missing action results"
+          ],
+          "acceptance": [
+            "Explain one choice and its result",
+            "Character and prop states connect",
+            "Compare two low-cost rhythms then inspect the full AV"
+          ],
+          "fallback": [
+            "Unreliable lip sync: use credible body movement, back views or declared stylization",
+            "Change the shot plan before endless regeneration"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "微叙事型MV",
+          "goal": "选择一种主导视觉策略发展歌曲。",
+          "materialPrerequisites": [
+            "歌曲与表演者形象的合法使用",
+            "实际乐段",
+            "可用take、动作和真实虚构属性"
+          ],
+          "structure": [
+            "欲望",
+            "障碍",
+            "乐段承载选择",
+            "后果"
+          ],
+          "pictureRhythm": [
+            "按乐句呼吸或动作切，不是逢拍切",
+            "记录有效入出状态",
+            "乐段之间改变密度"
+          ],
+          "audio": [
+            "保护主歌曲",
+            "音效不盖主唱",
+            "改画面后完整复听"
+          ],
+          "captions": [
+            "如需歌词则节制且可读",
+            "不逐字图解歌词"
+          ],
+          "failureModes": [
+            "强度不变",
+            "母题随机排列",
+            "口型不可信",
+            "动作缺结果"
+          ],
+          "acceptance": [
+            "说出一次选择与结果",
+            "角色道具状态衔接",
+            "比较两种低成本节奏，再完整声画审查"
+          ],
+          "fallback": [
+            "口型不可靠则改可信身体动作、背影或明确风格化",
+            "先改镜头方案，不无限重生成"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "music-video"
+      }
+    },
+    {
+      "id": "event-recap",
+      "purposes": [
+        "event",
+        "highlights"
+      ],
+      "style": "event-story",
+      "guideId": "documentary",
+      "sourceIds": [
+        "A01"
+      ],
+      "tags": [
+        "event",
+        "and",
+        "participation",
+        "recap",
+        "活动与参与感回顾",
+        "活动",
+        "赛事",
+        "回顾",
+        "演讲",
+        "直播",
+        "高光"
+      ],
+      "content": {
+        "en": {
+          "title": "Event and participation recap",
+          "goal": "Explain the core event and its outcome for a specific audience.",
+          "materialPrerequisites": [
+            "Agenda, required people and moments",
+            "Actual reactions and location sound",
+            "Interview, results and publication permissions"
+          ],
+          "structure": [
+            "Arrival and expectation",
+            "Participation or key event",
+            "Visible outcome and real response",
+            "Relevant next step"
+          ],
+          "pictureRhythm": [
+            "Keep preparation and result of key actions",
+            "Vary by information, not equal agenda slots",
+            "Sports/game highlights retain decisive process"
+          ],
+          "audio": [
+            "Connect actual voices, applause and room tone",
+            "Ducking should not leave isolated speech in silence"
+          ],
+          "captions": [
+            "Accurate names, roles and results",
+            "Confirm required sponsor/participant coverage"
+          ],
+          "failureModes": [
+            "Generic energetic montage hides meaning",
+            "Unrelated crowd implies fake scale",
+            "Required event omitted"
+          ],
+          "acceptance": [
+            "Absent viewer can explain who did what and why",
+            "Coverage checklist has no silent omissions",
+            "Data and permissions verified externally"
+          ],
+          "fallback": [
+            "Missing required coverage: disclose it",
+            "Talk-led streams use highlights/explainer; performance uses MV"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "活动与参与感回顾",
+          "goal": "为明确受众说明核心事件及结果。",
+          "materialPrerequisites": [
+            "议程、必留人物环节",
+            "真实反应与现场声",
+            "采访、成果和公开权限"
+          ],
+          "structure": [
+            "到场期待",
+            "参与或核心事件",
+            "可见结果与真实感受",
+            "相关下一步"
+          ],
+          "pictureRhythm": [
+            "关键动作保留准备与结果",
+            "按信息变化，不按议程等长",
+            "赛事游戏保留决定结果的过程"
+          ],
+          "audio": [
+            "连接原话、掌声和声底",
+            "降配乐后不只剩孤立人声"
+          ],
+          "captions": [
+            "名字身份成果准确",
+            "确认赞助方和参与者必留覆盖"
+          ],
+          "failureModes": [
+            "躁动混剪遮蔽意义",
+            "无关人群伪造规模",
+            "遗漏必留环节"
+          ],
+          "acceptance": [
+            "未到场者能说出谁做什么为何重要",
+            "覆盖缺失明确说明",
+            "数据和权限外部核验"
+          ],
+          "fallback": [
+            "缺少必拍需披露",
+            "知识直播转高光解释，表演转MV"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "documentary"
+      }
+    },
+    {
+      "id": "private-memory",
+      "purposes": [
+        "private-memory"
+      ],
+      "style": "relationship-memory",
+      "guideId": "documentary",
+      "sourceIds": [
+        "A02",
+        "A03"
+      ],
+      "tags": [
+        "family,",
+        "wedding",
+        "and",
+        "private",
+        "memory",
+        "家庭婚礼与私人纪念",
+        "家庭",
+        "婚礼",
+        "纪念"
+      ],
+      "content": {
+        "en": {
+          "title": "Family, wedding and private memory",
+          "goal": "Preserve meaningful relationships and original voices over spectacle.",
+          "materialPrerequisites": [
+            "Priority people and rituals",
+            "Required original words",
+            "Privacy, children and sharing scope",
+            "Keep full records separate from highlights"
+          ],
+          "structure": [
+            "Expectation",
+            "Meeting or promise",
+            "Shared celebration",
+            "Memory or relationship return"
+          ],
+          "pictureRhythm": [
+            "Allow breathing around vows, expressions and embraces",
+            "Keep valuable imperfect footage",
+            "Do not replace relatives with generated faces"
+          ],
+          "audio": [
+            "Original voices take priority",
+            "Smooth music entry/exit",
+            "Preserve separate complete vows/speeches if requested"
+          ],
+          "captions": [
+            "Check names, relationships and dates",
+            "Readable across ages",
+            "Never rewrite a blessing to heighten emotion"
+          ],
+          "failureModes": [
+            "Borrowed emotional reaction",
+            "Fabricated vow",
+            "Private material published without agreement",
+            "Summary mislabeled as full record"
+          ],
+          "acceptance": [
+            "Required people and words remain",
+            "Sound is understandable and emotion natural",
+            "Confirm privacy and deliverable scope"
+          ],
+          "fallback": [
+            "Missing ritual: disclose; never invent",
+            "Unsynced angles: manual selection, no promise of automatic multicam"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke executes discovered commands, editable captions, existing effects, audio mixing and preview/export; query current help for each payload.",
+            "Selection, narrative, facts, rights, meaningful timing and perceptual review remain external Agent/human decisions.",
+            "Do not assume automated semantic footage search, speaker identification, UI recognition or factual verification; unsupported work becomes an explicit gap, not an invented command."
+          ]
+        },
+        "zh-CN": {
+          "title": "家庭婚礼与私人纪念",
+          "goal": "优先珍贵关系与原声，保留长期记忆。",
+          "materialPrerequisites": [
+            "重点人物与仪式",
+            "必须保留的原话",
+            "隐私儿童和分享范围",
+            "完整记录与精华分开"
+          ],
+          "structure": [
+            "期待",
+            "相遇或承诺",
+            "共同庆祝",
+            "关系与记忆回归"
+          ],
+          "pictureRhythm": [
+            "誓词表情拥抱前后留呼吸",
+            "珍贵粗糙镜头可保留",
+            "不生成陌生脸替亲人"
+          ],
+          "audio": [
+            "原声优先",
+            "配乐平滑进入退出",
+            "按约定单独保存完整誓词致辞"
+          ],
+          "captions": [
+            "核姓名关系日期",
+            "照顾不同年龄阅读",
+            "不擅改祝福煽情"
+          ],
+          "failureModes": [
+            "挪用情绪反应",
+            "补造誓词",
+            "未经同意公开私密素材",
+            "摘要冒充完整记录"
+          ],
+          "acceptance": [
+            "必留人物与原话未丢",
+            "声音清楚且情绪自然",
+            "核隐私与交付范围"
+          ],
+          "fallback": [
+            "缺仪式则说明，不编造",
+            "未同步机位手工选择，不承诺自动多机位"
+          ],
+          "capabilityBoundaries": [
+            "CutVoke执行已发现的剪辑命令、可编辑字幕、现有效果、混音与预览导出；每个参数先查询当前帮助。",
+            "选材、叙事、事实、授权、有意义的停留和视听判断由外部Agent或人工承担。",
+            "不假设已有自动语义素材搜索、说话人身份识别、UI语义识别或事实核验；不支持项记为缺口，不编造命令。"
+          ]
+        }
+      },
+      "guideRequest": {
+        "topic": "creative",
+        "guide": "documentary"
+      }
+    }
+  ],
+  "sources": {
+    "C01": {
+      "id": "C01",
+      "urls": [
+        "https://li-yang.cn/ai-edited-new-zealand-vlogs/"
+      ],
+      "reportNote": "C01　Geek Li 新西兰旅行的VLOG是AI剪的2026-10-15。具名第一人称复盘，含修改过程；读正文与页面截图信息。未独立回放成片。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "C02": {
+      "id": "C02",
+      "urls": [
+        "https://newrank.cn/article/detail/25321"
+      ],
+      "reportNote": "C02　阿虎 美丽新世界制作复盘2024-04-12，新榜刊载。主创工作流与失败说明；旧模型环境，不能当作当前所有模型的能力边界。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "C03": {
+      "id": "C03",
+      "urls": [
+        "https://www.thepaper.cn/newsDetail_forward_27028493"
+      ],
+      "reportNote": "C03　卡兹克 玉覆荆楚制作复盘2024-04-15，澎湃转载页面。具名创作经验；不将文中个人景别禁忌推广为剪辑铁律。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "C04": {
+      "id": "C04",
+      "urls": [
+        "https://li-yang.cn/on-time-ai-short-film-workflow/"
+      ],
+      "reportNote": "C04　Geek Li 没迟到制作流程2026-07-21。具名项目复盘，含镜头与返工说明；成本为作者估计。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "C05": {
+      "id": "C05",
+      "urls": [
+        "https://tiaozhuxiansheng.com/2026-09-06-v1-47fea6b/"
+      ],
+      "reportNote": "C05　跳蛛先生 余温制作记录2026-09-06，更新至09-26。个人切点和声音修订记录；媒体在作者本地，本轮未独立审听。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "C06": {
+      "id": "C06",
+      "urls": [
+        "https://sspai.com/post/117130"
+      ],
+      "reportNote": "C06　Jimmyzimo 日落大道MV制作经验2026-10-23，少数派。具名实操复盘；模型身份和费用属作者自述，不是性能基准。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "C07": {
+      "id": "C07",
+      "urls": [
+        "https://www.nfpeople.com/index.php/article/14095"
+      ],
+      "reportNote": "C07　南方人物周刊 DiDi_OK与牌子创作采访2026-05-18，陈诗雨、郭宇翔、杨楠。直接采访；生成次数与投入为受访者自述。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "E01": {
+      "id": "E01",
+      "urls": [
+        "https://evandro-miguel.com/articles/isa-short-film-production/"
+      ],
+      "reportNote": "E01　Evandro Miguel ISA Short Film Production2026-10-15。导演技术复盘；本文仅提取实际成片与跨切点验收原则，未复现其流程。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "E02": {
+      "id": "E02",
+      "urls": [
+        "https://medium.com/@gorociao/the-ai-directors-playbook-where-traditional-filmmaking-instincts-meet-generative-workflows-414632651815"
+      ],
+      "reportNote": "E02　Erica Gorochow The AI Director’s Playbook2026-02-03。Google节日广告主创原帖；品牌项目及合作背景，含传统表演和后期环节。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "E03": {
+      "id": "E03",
+      "urls": [
+        "https://www.creativebloq.com/ai/how-a-filmmaker-turned-a-10-year-old-unmakeable-movie-idea-into-reality-with-ai"
+      ],
+      "reportNote": "E03　Kévin Mendiboure谈CATACOMBES2026-06-09，Creative Bloq直接采访。本文只短摘边生成边剪、检查反打连续性的经验；未观看成片。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "E04": {
+      "id": "E04",
+      "urls": [
+        "https://creativepossible.substack.com/p/making-a-shortform-ai-animation-series"
+      ],
+      "reportNote": "E04　Gabe Michael Making a Shortform AI Animation Series2025-08-11。Let Us Explore系列第三篇；只读付费墙前公开正文，未读后半；含工具推广链接。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "E05": {
+      "id": "E05",
+      "urls": [
+        "https://www.provideocoalition.com/ai-tools-artist-spotlight-kelly-boesch/"
+      ],
+      "reportNote": "E05　Jeff Foster采访Kelly Boesch2026-01-05，ProVideo Coalition。具名艺术家访谈；受访者与多家工具厂商有creative partner关系。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "E06": {
+      "id": "E06",
+      "urls": [
+        "https://nofilmschool.com/ai-music-video?trk=public_post_comment-text"
+      ],
+      "reportNote": "E06　Paul Trillo谈Washed Out的Hardest Part2024年5月前后，页面未显示可确认的精确日期，No Film School直接采访。OpenAI早测背景；不推算普通用户成本。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "E07": {
+      "id": "E07",
+      "urls": [
+        "https://higgsfield.ai/blog/david-bianchi-don-diablo-ai-music-video"
+      ],
+      "reportNote": "E07　David Bianchi与Don Diablo AI Music Video约2026-10-27，作品发布为2026-09-18。Higgsfield合作采访，具营销利益关系；次数与工期仅为自报。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "T01": {
+      "id": "T01",
+      "urls": [
+        "https://unscripted.com/faq/"
+      ],
+      "reportNote": "T01　Brandon Li Unscripted FAQ页面标更新2024年5月。本人旅行拍摄与剪辑经验，兼有课程营销；本报告不采用绝对化帧率说法。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "T02": {
+      "id": "T02",
+      "urls": [
+        "https://www.mirrorlessons.com/2015/10/02/going-nomad-to-film-the-world-with-the-sony-a7s-an-interview-with-filmmaker-brandon-li/"
+      ],
+      "reportNote": "T02　MirrorLessons采访Brandon Li2015-10-02，Mathieu直接采访。读正文，未看所谈作品；传统制作经验可迁移，不是AI评测。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "T03": {
+      "id": "T03",
+      "urls": [
+        "https://blog.ricksteves.com/cameron/2024/07/making-of-iceland-tv"
+      ],
+      "reportNote": "T03　Cameron Hewitt 冰岛电视节目制作亲历2024-07-30。具名制片现场记录，包含脚本与天气应对；不当作旅游信息现状来源。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "T04": {
+      "id": "T04",
+      "urls": [
+        "https://www.pbs.org/video/rick-steves-europe-rick-steves-europe-making/"
+      ],
+      "reportNote": "T04　PBS Rick Steves Europe The Making Of2006-10-07。视频页面不可播放，本轮阅读网页提供的完整字幕；不声称观看或试听过该节目。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "P01": {
+      "id": "P01",
+      "urls": [
+        "https://riverside.com/university-videos/how-to-edit-a-podcast-episode-start-to-finish-in-riverside"
+      ],
+      "reportNote": "P01　Leah Sparrow 从头到尾编辑播客2026-10-09，Riverside University。读实操视频的完整文字转写，未观看；厂商自有渠道，非留存效果实验。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "P02": {
+      "id": "P02",
+      "urls": [
+        "https://riverside.com/blog/podcast-editing"
+      ],
+      "reportNote": "P02　Stephen Robles Podcast Editing更新2026-07-31，Riverside。具名第一人称实践，厂商刊载；不用于宣称自动多机位的普遍性能。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "P03": {
+      "id": "P03",
+      "urls": [
+        "https://www.solutionsjournalism.org/learning-lab/toolkits-guides/curriculum-builder/solutions-journalism-many-forms/guidance-teaching-0"
+      ],
+      "reportNote": "P03　JD Allen 新闻叙事教学指导Solutions Journalism Network教育材料，首发日期本轮未核实。读正文；特定新闻场景比例不推广为通用模板。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "P04": {
+      "id": "P04",
+      "urls": [
+        "https://transom.org/2019/scoring-stories-part-2/"
+      ],
+      "reportNote": "P04　Rob Rosenthal Scoring Stories Part 22019-10-28，Transom。专业声音叙事教程；本轮只读文字，未试听声音案例，不属于AI工具评测。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "S01": {
+      "id": "S01",
+      "urls": [
+        "https://blog.youtube/creator-and-artist-stories/youtube-shorts-deep-dive/"
+      ],
+      "reportNote": "S01　YouTube Shorts Deep Dive2025-01-28，YouTube官方Jenny Hoyos与Todd Sherman访谈摘要。只读摘要未看视频；开头时机是创作者经验，不是因果实验。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "S02": {
+      "id": "S02",
+      "urls": [
+        "https://blog.youtube/creator-and-artist-stories/transitioning-your-long-form-content-to-youtube-shorts/"
+      ],
+      "reportNote": "S02　将长视频转为YouTube Shorts2025-04-16，YouTube官方教程。读正文；竖屏与独立片段作为适配依据，不承诺流量或长片转化。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "K01": {
+      "id": "K01",
+      "urls": [
+        "https://www.3blue1brown.com/about/",
+        "https://github.com/3b1b/videos"
+      ],
+      "reportNote": "K01　3Blue1Brown 关于制作与ManimGrant Sanderson原作者说明，首发日期本轮未核实。动画片段与后续剪辑分工是传统创作经验，不是AI agent实战结果。配套原始代码为 3b1b videos。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "K02": {
+      "id": "K02",
+      "urls": [
+        "https://github.com/new-xp/ultrademo",
+        "https://github.com/new-xp/ultrademo/blob/main/examples/notion-tracker/flow.mjs"
+      ],
+      "reportNote": "K02　new xp Ultrademo公开作者项目，2026-11-02核实；未安装运行或完整观看。90秒教程为作者自报。具体示例为 Notion tracker flow。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "K03": {
+      "id": "K03",
+      "urls": [
+        "https://sailios.com/videos/how-an-ai-made-a-documentary/",
+        "https://sailios.com/prompts/documentary-production/"
+      ],
+      "reportNote": "K03　Sailios How an AI Made a Documentary原作者制作文本，首发日期本轮未核实；制作花絮仍标coming soon，未观看。另读 Documentary Production流程；未复现。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "A01": {
+      "id": "A01",
+      "urls": [
+        "https://www.canon.ca/en/Pro-Inspiration/Five-steps-for-producing-engaging-event-recap-videos"
+      ],
+      "reportNote": "A01　Canon 制作活动回顾视频的五个步骤官方教育页面，首发日期本轮未核实。品牌背景；其特定片长和旁白取舍仅适用于文中场景。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "A02": {
+      "id": "A02",
+      "urls": [
+        "https://whoismatt.com/use-ai-to-edit-wedding-ceremony-videos-fast-in-premiere-pro/"
+      ],
+      "reportNote": "A02　Matt Johnson 用AI剪婚礼仪式2023-12-12，更新2026-08-17。作者实操教程，读正文未看视频；有课程商业关系，演示条件不泛化为所有版本。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "A03": {
+      "id": "A03",
+      "urls": [
+        "https://artlist.io/blog/wedding-video-tips-from-matt-johnson/"
+      ],
+      "reportNote": "A03　Artlist采访Matt Johnson谈婚礼视频2019-11-04。直接问答，商业音乐平台与合作背景；不是2026趋势调查。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "G01": {
+      "id": "G01",
+      "urls": [
+        "https://raw.githubusercontent.com/heygen-com/hyperframes/main/skills/hyperframes/references/review.md"
+      ],
+      "reportNote": "G01　HyperFrames Review规范2026-11-02核实公开当前文档，未安装运行。用于审片证据设计，不作为成片质量实证；仓库内容可能继续变化。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "G02": {
+      "id": "G02",
+      "urls": [
+        "https://raw.githubusercontent.com/Vincentwei1021/video-shotcraft/main/references/pipeline.md"
+      ],
+      "reportNote": "G02　video shotcraft Pipeline2026-11-02核实。公开工作流与镜头卡设计，未安装运行；主要面向产品动效，不把全部卡拍方法套到采访。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "G03": {
+      "id": "G03",
+      "urls": [
+        "https://arxiv.org/html/2610.37690v1"
+      ],
+      "reportNote": "G03　Cassette Editor 论文2026-10-19，预印本。源区间、时间线实例与渲染观察为设计参考；编辑修复实验未测意图、审美或用户收益。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "R01": {
+      "id": "R01",
+      "urls": [
+        "https://arxiv.org/html/2608.24329v1"
+      ],
+      "reportNote": "R01　How Do Professional Editors Evaluate the Editing Quality of AI Generated Cinematic Video AdsPo-Ming Law、Weizhi Li、Arpit Narechania，2026-08-25，arXiv预印本；已读全文。广告样本，不推广为所有视频的统一量表。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    },
+    "R02": {
+      "id": "R02",
+      "urls": [
+        "https://arxiv.org/abs/2605.27174"
+      ],
+      "reportNote": "R02　An investigation of AI integration in sound designer workflows and experiencesNelly Garcia、Joshua Reiss，2026-05-26，arXiv摘要页；本轮只读摘要，不推断未读的全文方法细节。",
+      "verification": "Derived from the 2026-11-02 research report; source text reading is not viewing/listening or independent replication."
+    }
+  },
+  "workflow": [
+    {
+      "stage": "plan",
+      "tool": "creative_workflow",
+      "arguments": {
+        "operation": "schema",
+        "kind": "plan"
+      },
+      "prerequisite": "Verify brief, usable source ranges and gaps; purpose/style/delivery are separate.",
+      "output": "Project-local plan JSON with current project/revision/sequence, evidence roles, protected ranges and shot intentions."
+    },
+    {
+      "stage": "rough-cut",
+      "tools": [
+        "editor_help",
+        "edit_lock",
+        "command_preview",
+        "command_apply"
+      ],
+      "prerequisite": "Discover exact commands; acquire lease; rational times, stable commandId and current revision.",
+      "output": "Editable rough cut; use edit.batch for one undo point. Release lease in finally."
+    },
+    {
+      "stage": "evidence",
+      "tools": [
+        "preview_frames",
+        "preview_prepare",
+        "preview_job",
+        "export_job"
+      ],
+      "commands": [
+        "project.preflight",
+        "export.enqueue"
+      ],
+      "prerequisite": "Bind every artifact to rendered revision. preview_frames max 6; preview_prepare is full-length. For a bounded dynamic prototype use export.enqueue range, never invent a preview range argument.",
+      "output": "Actual frames and continuous AV. Low-resource: inspect one representative range at a time and bounded polling; never lower final quality without consent."
+    },
+    {
+      "stage": "review",
+      "tool": "creative_workflow",
+      "arguments": {
+        "operation": "schema",
+        "kind": "review"
+      },
+      "prerequisite": "Inspect actual output where sensory input is supported; record pending evidence otherwise.",
+      "output": "Timecoded issues, evidence IDs, inspector, suggested local action and semantic preserve requirements. No automatic artistic score."
+    },
+    {
+      "stage": "repair",
+      "tool": "creative_workflow",
+      "arguments": {
+        "operation": "preview-repair"
+      },
+      "prerequisite": "Supply repair document plus plan/review for the same current revision and active sequence.",
+      "output": "Read-only existing edit.batch preview, scope/protection checks and exact nextCall when valid. Nothing is committed. Semantic preserve statements still require source/perceptual review."
+    },
+    {
+      "stage": "recheck",
+      "tools": [
+        "command_apply",
+        "preview_frames",
+        "preview_prepare",
+        "preview_job"
+      ],
+      "prerequisite": "Acquire lease and submit the previewed payload with same expectedRevision and stable commandId. On conflict reconcile and preview again.",
+      "output": "New revision invalidates prior evidence. Rebuild artifacts, inspect affected neighbors and full AV, then export and review final bytes."
+    }
+  ]
+}

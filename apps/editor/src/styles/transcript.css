@@ -1,0 +1,14 @@
+.transcript-editor { margin-block: 12px; min-width: 0; }
+.transcript-editor > summary { width: 100%; }
+.transcript-editor__sentences { max-height: 220px; overflow: auto; display: grid; gap: 8px; margin-block: 8px; }
+.transcript-editor__sentence { border-bottom: 1px solid var(--border); padding-block: 6px; min-width: 0; }
+.transcript-editor__sentence label { display: flex; gap: 8px; align-items: start; overflow-wrap: anywhere; }
+.transcript-editor__sentence input { flex-shrink: 0; }
+.transcript-editor__sentence small { color: var(--text-muted); font-variant-numeric: tabular-nums; direction: ltr; }
+.transcript-editor__actions, .transcript-editor__words, .transcript-editor__ranges { display: flex; flex-wrap: wrap; gap: 6px; margin-block: 8px; }
+.transcript-editor__word-caption { display: grid; gap: 6px; margin-top: 12px; min-width: 0; }
+.transcript-editor__word-caption select { min-width: 0; width: 100%; }
+.transcript-editor__words [aria-pressed="true"] { outline: 2px solid var(--accent, #56c5b6); outline-offset: -2px; }
+.transcript-editor__ranges p { flex-basis: 100%; margin-block: 0; }
+.transcript-editor__review { border: 1px solid var(--accent, #56c5b6); padding: 10px; margin-top: 8px; border-radius: 6px; overflow-wrap: anywhere; }
+.transcript-editor__review .cv-btn { margin: 4px; white-space: normal; }

@@ -23,6 +23,7 @@ import {
   sendCommand,
 } from "../lib/api";
 import { secsToRational } from "../lib/rational";
+import { isOlderRevision } from "../lib/projectSync";
 import type { ProjectListItem } from "../lib/api";
 import type { EditLease } from "../lib/api";
 import type { ExportResult, Project, Rational } from "../types/api";
@@ -79,6 +80,8 @@ export interface EditorState {
   lastSync: number;
   /** 播放头时间（秒），Player 与时间线标尺共享。 */
   playhead: number;
+  /** Explicit seek intent; transport ticks never increment this UI-only counter. */
+  playheadSeekVersion: number;
   /** 标尺或播放头正在拖动；只影响预览调度，不写入工程。 */
   scrubbing: boolean;
   /** 剪映式工具模式：select 选择 / cut 切割。 */
@@ -124,7 +127,7 @@ export type EditorAction =
   | { type: "CLIP_SELECTION_SET"; clipIds: string[]; primaryId?: string; anchorId?: string | null }
   | { type: "SYNC" }
   | { type: "RESET_SELECTION_FOR"; trackId: string | null }
-  | { type: "PLAYHEAD_SET"; t: number }
+  | { type: "PLAYHEAD_SET"; t: number; source?: "transport" }
   | { type: "SCRUBBING_SET"; active: boolean }
   | { type: "TOOL_MODE_SET"; mode: ToolMode }
   | { type: "SNAP_TOGGLE" }
@@ -159,6 +162,7 @@ const initialState: EditorState = {
   selectedCaptionId: null,
   lastSync: 0,
   playhead: 0,
+  playheadSeekVersion: 0,
   scrubbing: false,
   toolMode: "select",
   snapEnabled: true,
@@ -214,6 +218,7 @@ function reducer(state: EditorState, action: EditorAction): EditorState {
         project: null,
         revision: "",
         playhead: 0,
+        playheadSeekVersion: 0,
         scrubbing: false,
         error: null,
         opening: true,
@@ -228,7 +233,7 @@ function reducer(state: EditorState, action: EditorAction): EditorState {
         titleDrafts: {},
       };
     case "PROJECT_LOADED":
-      if (action.project.projectId !== state.currentId) return state;
+      if (action.project.projectId !== state.currentId || isOlderRevision(action.project.revision, state.revision)) return state;
       return {
         ...state,
         project: action.project,
@@ -279,7 +284,8 @@ function reducer(state: EditorState, action: EditorAction): EditorState {
     case "SYNC":
       return { ...state, lastSync: Date.now() };
     case "PLAYHEAD_SET":
-      return { ...state, playhead: action.t };
+      return { ...state, playhead: action.t,
+        playheadSeekVersion: state.playheadSeekVersion + (action.source === "transport" ? 0 : 1) };
     case "SCRUBBING_SET":
       return state.scrubbing === action.active ? state : { ...state, scrubbing: action.active };
     case "TOOL_MODE_SET":
@@ -355,7 +361,7 @@ export function EditorProvider({ children }: { children: ReactNode }) {
   // This snapshot updates for every editing change; event handlers read the live
   // playhead through getLatestState() when they need a clock value.
   if ((Object.keys(state) as (keyof EditorState)[]).some((key) =>
-    key !== "playhead" && key !== "lastSync" && state[key] !== editingState.current[key])) {
+    key !== "playhead" && key !== "playheadSeekVersion" && key !== "lastSync" && state[key] !== editingState.current[key])) {
     editingState.current = state;
   }
   const editingValue = useMemo(() => ({ state: editingState.current, dispatch }), [editingState.current, dispatch, locale]);
