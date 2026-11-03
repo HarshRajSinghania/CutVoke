@@ -340,9 +340,13 @@ test('a user keyboard seek within an audition cancels native audio before its bo
         const sample = (event as CustomEvent).detail;
         const audio = (window as any).__transcriptAudio as HTMLAudioElement[];
         if (!sample.playing || sample.time < 1.1 || sample.time >= 1.8 || !audio.some(element => !element.paused)) return;
-        window.removeEventListener('cutvoke:transport-clock', seekWhileRunning);
         const ruler = document.querySelector<HTMLElement>('.timeline-ruler')!;
         const before = Number(ruler.getAttribute('aria-valuenow'));
+        // The transport event precedes the React commit. Keyboard navigation
+        // uses the rendered playhead, so wait until that value is in the same
+        // audition window rather than assuming it already matches the clock.
+        if (!Number.isFinite(before) || before < 1.1 || before >= 1.8) return;
+        window.removeEventListener('cutvoke:transport-clock', seekWhileRunning);
         ruler.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
         resolve(before + 1 / 15);
       };
