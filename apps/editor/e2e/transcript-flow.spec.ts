@@ -97,16 +97,35 @@ test('Chinese word selection locates exact timing and ordinary caption editing n
   expect((await read(request, id)).sequence.tracks).toEqual(before.sequence.tracks);
 });
 
-test('transcript audition stops actual video and native audio at the selected word boundary', async ({ page, request }) => {
+for (const delayedFrames of [false, true]) {
+test(`transcript audition stops actual video and native audio at the selected word boundary${delayedFrames ? ' with delayed animation frames' : ''}`, async ({ page, request }) => {
   await page.addInitScript(() => {
     const captured: HTMLAudioElement[] = []; (window as any).__transcriptAudio = captured;
     const Original = window.Audio;
-    window.Audio = new Proxy(Original, { construct(target, args) { const audio = Reflect.construct(target, args); captured.push(audio); return audio; } });
+    (window as any).__nativePauseTimes = [];
+    window.Audio = new Proxy(Original, { construct(target, args) {
+      const audio = Reflect.construct(target, args) as HTMLAudioElement;
+      const pause = audio.pause.bind(audio);
+      audio.pause = () => { if (!audio.paused) (window as any).__nativePauseTimes.push(audio.currentTime); pause(); };
+      captured.push(audio); return audio;
+    } });
     (window as any).__transport = [];
     window.addEventListener('cutvoke:transport-clock', event => (window as any).__transport.push((event as CustomEvent).detail));
   });
   const id = await fixture(request); const panel = await open(page, id);
   await expect(page.getByTestId('live-audio-meter')).toHaveAttribute('data-ready', 'true', { timeout: 20_000 });
+  if (delayedFrames) await page.evaluate(() => {
+    // Delay render callbacks, not timers or the audio device. A bounded
+    // audition must not rely on the screen's refresh cadence to stop sound.
+    const raf = window.requestAnimationFrame.bind(window);
+    const cancel = window.cancelAnimationFrame.bind(window);
+    const delayed = new Map<number, number>();
+    window.requestAnimationFrame = callback => {
+      const id = raf(() => { delayed.set(id, window.setTimeout(() => { delayed.delete(id); callback(performance.now()); }, 250)); });
+      return id;
+    };
+    window.cancelAnimationFrame = id => { cancel(id); const timer = delayed.get(id); if (timer !== undefined) clearTimeout(timer); delayed.delete(id); };
+  });
   await panel.locator('select').selectOption('words'); await panel.getByRole('button', { name: '你好', exact: true }).click();
   await panel.getByRole('button', { name: '试听 3.00–3.50 秒', exact: true }).click();
   await expect.poll(() => page.evaluate(() => (window as any).__transcriptAudio.some((audio: HTMLAudioElement) => !audio.paused && audio.currentTime >= 3))).toBe(true);
@@ -115,10 +134,13 @@ test('transcript audition stops actual video and native audio at the selected wo
   await expect.poll(() => page.evaluate(() => (window as any).__transport.at(-1)?.time)).toBe(3.5);
   await expect(page.locator('.statusbar__msg')).toHaveText('已暂停');
   const stopped = await page.evaluate(() => ({ audio: (window as any).__transcriptAudio.map((audio: HTMLAudioElement) => audio.currentTime),
-    submitted: (window as any).__transport.filter((value: any) => value.playing && value.time >= 3).map((value: any) => value.time) }));
+    submitted: (window as any).__transport.filter((value: any) => value.playing && value.time >= 3).map((value: any) => value.time),
+    nativePauses: (window as any).__nativePauseTimes.filter((time: number) => time >= 3) }));
   expect(stopped.submitted.some((time: number) => time > 3.1)).toBe(true);
   expect(Math.max(...stopped.submitted)).toBeLessThan(3.58);
   expect(stopped.audio.every((time: number) => Math.abs(time - 3.5) < .1)).toBe(true);
+  expect(stopped.nativePauses.length).toBeGreaterThan(0);
+  expect(Math.max(...stopped.nativePauses)).toBeLessThan(3.58);
   await page.screenshot({ path: '../../.artifacts/transcript-word-review.png' });
   // Starting a longer audition, then an explicit seek, stops every audio voice too.
   await panel.locator('.transcript-editor__sentence').filter({ hasText: '你好，开场句子' }).getByRole('button', { name: '试听', exact: true }).click();
@@ -133,6 +155,8 @@ test('transcript audition stops actual video and native audio at the selected wo
   await expect(page.locator('.statusbar__msg')).toHaveText('已暂停');
   await expect.poll(() => page.evaluate(() => (window as any).__transcriptAudio.every((audio: HTMLAudioElement) => audio.paused))).toBe(true);
 });
+
+}
 
 test('locked downstream track blocks transcript preview and deletion', async ({ page, request }) => {
   const id = await fixture(request); await apply(request, id, 'track.update', { trackId: 'audio', locked: true });

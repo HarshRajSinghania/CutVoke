@@ -20,15 +20,28 @@ export function useTranscriptAudition(options: Options) {
   latest.current = options;
   const active = useRef<TranscriptAudition | null>(null);
   const frame = useRef(0);
+  const deadline = useRef(0);
   const stop = (end?: number) => {
     if (!active.current) return;
     active.current = null;
     cancelAnimationFrame(frame.current);
+    window.clearTimeout(deadline.current);
+    deadline.current = 0;
     latest.current.pause();
     // Native audio voices are detached elements. Pause synchronously even when
     // the tab is hidden and their normal animation-frame update is suspended.
-    window.dispatchEvent(new Event(STOP_AUDITION_AUDIO_EVENT));
+    window.dispatchEvent(new CustomEvent(STOP_AUDITION_AUDIO_EVENT, { detail: { time: end } }));
     if (end !== undefined) { latest.current.seek(end); latest.current.onEnd?.(); }
+  };
+  // Every transport consumer checks this before publishing/using a clock.
+  // A late paint must not publish an overrun and then restart paused media.
+  const stopAtBoundary = (time: number): number | null => {
+    const target = active.current, now = latest.current;
+    if (!target || now.projectId !== target.projectId || now.sequenceId !== target.sequenceId || now.revision !== target.revision) return null;
+    if (time < target.end) return null;
+    const end = target.end;
+    stop(end);
+    return end;
   };
   // Seeking or scrubbing deliberately ends an audition, including seeks inside its range.
   useLayoutEffect(() => {
@@ -60,6 +73,23 @@ export function useTranscriptAudition(options: Options) {
         }
         if (now.scrubbing || document.hidden) { stop(); return; }
         now.play();
+        // Audio keeps running when RAF callbacks are delayed. Arm an
+        // independent timer from the actual media clock, not elapsed wall
+        // time: a suspended device or buffering video must not lose its range.
+        const checkDeadline = () => {
+          const target = active.current;
+          if (!target) return;
+          const now = latest.current;
+          if (now.projectId !== target.projectId || now.sequenceId !== target.sequenceId || now.revision !== target.revision) { stop(); return; }
+          const clock = now.clock(), video = now.video.current;
+          if (!active.current) return; // The shared clock may have stopped us.
+          const time = clock?.time ?? (video && !video.paused ? now.windowStart + video.currentTime : now.playhead);
+          if (stopAtBoundary(time) !== null) return;
+          deadline.current = window.setTimeout(checkDeadline,
+            clock?.playing ? Math.max(1, (target.end - time) * 1000) : 25);
+        };
+        checkDeadline();
+        if (!active.current) return;
         const tick = () => {
           const target = active.current;
           if (!target) return;
@@ -95,4 +125,5 @@ export function useTranscriptAudition(options: Options) {
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [options.projectId, options.sequenceId, options.revision]);
+  return stopAtBoundary;
 }

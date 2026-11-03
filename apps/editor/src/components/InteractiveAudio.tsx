@@ -25,7 +25,21 @@ export function InteractiveAudio({ playing, onReady, playbackClock, onClockSourc
   const latest = useRef({ project, time: state.playhead, playing, onReady, playbackClock, onClockSource });
   latest.current = { project, time: state.playhead, playing, onReady, playbackClock, onClockSource };
   useEffect(() => {
-    const pause = () => { for (const voice of voices.current.values()) voice.element.pause(); };
+    const pause = (event: Event) => {
+      const time = (event as CustomEvent<{ time?: number }>).detail?.time;
+      for (const [id, voice] of voices.current) {
+        voice.element.pause();
+        // Correct the native cursor synchronously at natural range end. On
+        // cancellation no time is supplied, so an explicit seek stays intact.
+        if (time === undefined || !Number.isFinite(time) || voice.element.readyState < 1) continue;
+        const clip = latest.current.project?.sequence.tracks.flatMap(track => track.clips).find(item => item.id === id);
+        if (!clip) continue;
+        if (time < rationalToSecs(clip.timelineStart) || time > rationalToSecs(clip.timelineEnd)) continue;
+        const target = voice.prepared ? time - rationalToSecs(clip.timelineStart) : sourceTime(clip, time);
+        const end = Number.isFinite(voice.element.duration) ? Math.max(0, voice.element.duration - .001) : target;
+        voice.element.currentTime = Math.min(end, Math.max(0, target));
+      }
+    };
     window.addEventListener(STOP_AUDITION_AUDIO_EVENT, pause);
     return () => window.removeEventListener(STOP_AUDITION_AUDIO_EVENT, pause);
   }, []);

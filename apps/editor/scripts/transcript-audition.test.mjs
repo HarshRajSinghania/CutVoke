@@ -17,7 +17,10 @@ const events = { AUDITION_RANGE_EVENT: 'audition', CANCEL_AUDITION_EVENT: 'cance
 function harness() {
   const window = new EventTarget(), document = Object.assign(new EventTarget(), { hidden: false });
   let cursor = 0, serial = 0, pending = [];
-  const slots = [], frames = new Map();
+  const slots = [], frames = new Map(), timers = new Map();
+  let wall = 0;
+  window.setTimeout = (callback, delay) => { timers.set(++serial, { callback, at: wall + delay }); return serial; };
+  window.clearTimeout = id => timers.delete(id);
   const useEffect = (callback, dependencies) => {
     const index = cursor++, previous = slots[index];
     if (previous && dependencies.every((value, offset) => Object.is(value, previous.dependencies[offset]))) return;
@@ -27,9 +30,10 @@ function harness() {
     react: { useEffect, useLayoutEffect: useEffect, useRef: value => {
       const index = cursor++; return slots[index] ||= { current: value };
     } }, '../lib/transcript': events,
-  }, { window, document, Event, requestAnimationFrame: callback => { frames.set(++serial, callback); return serial; },
+  }, { window, document, Event, CustomEvent, requestAnimationFrame: callback => { frames.set(++serial, callback); return serial; },
     cancelAnimationFrame: id => frames.delete(id) });
   let running = false, time = 3, pauses = 0, audioStops = 0, ended = 0;
+  let boundary = () => null;
   const seeks = [];
   window.addEventListener(events.STOP_AUDITION_AUDIO_EVENT, () => audioStops++);
   let options = { projectId: 'p', sequenceId: 's', revision: '5', end: 5, playhead: 3, seekVersion: 0, scrubbing: false,
@@ -40,7 +44,7 @@ function harness() {
     pause: () => { pauses++; running = false; }, seek: value => seeks.push(value), onEnd: () => ended++ };
   const render = patch => {
     options = { ...options, ...patch }; cursor = 0; pending = [];
-    useTranscriptAudition(options); for (const commit of pending) commit();
+    boundary = useTranscriptAudition(options) || (() => null); for (const commit of pending) commit();
   };
   const frame = next => {
     time = next; const callbacks = [...frames.values()]; frames.clear();
@@ -49,7 +53,12 @@ function harness() {
   const begin = () => window.dispatchEvent(new CustomEvent(events.AUDITION_RANGE_EVENT,
     { detail: { projectId: 'p', sequenceId: 's', revision: '5', start: 3, end: 3.5 } }));
   render({});
-  return { render, frame, begin, options: () => options, running: () => running, pauses: () => pauses,
+  const advanceTimers = next => {
+    time = next; wall = (next - 3) * 1000;
+    const due = [...timers.entries()].filter(([, value]) => value.at <= wall);
+    for (const [id, value] of due) { timers.delete(id); value.callback(); }
+  };
+  return { render, frame, begin, advanceTimers, boundary: next => boundary(next), timerCount: () => timers.size, options: () => options, running: () => running, pauses: () => pauses,
     seeks, audioStops: () => audioStops, ended: () => ended, window, document };
 }
 
@@ -129,4 +138,29 @@ test('a stale frame delivered before scope effect cleanup cannot seek or publish
     assert.equal(h.running(), false); assert.equal(h.audioStops(), 1); assert.equal(h.ended(), 0);
     assert.deepEqual(h.seeks, [3]);
   }
+});
+
+
+test('an independent media-clock deadline stops native audio when animation frames do not arrive', () => {
+  const h = harness(); h.begin(); h.frame(3);
+  assert.equal(h.running(), true);
+  h.advanceTimers(3.501); // No RAF callbacks after startup.
+  assert.equal(h.running(), false);
+  assert.equal(h.audioStops(), 1); assert.equal(h.seeks.at(-1), 3.5);
+  assert.equal(h.timerCount(), 0);
+});
+
+test('the shared transport checks the audition boundary before publishing a delayed clock sample', () => {
+  const h = harness(); h.begin(); h.frame(3);
+  assert.equal(h.boundary(3.65), 3.5);
+  assert.equal(h.running(), false); assert.equal(h.audioStops(), 1);
+  assert.equal(h.boundary(3.7), null); assert.equal(h.ended(), 1);
+});
+
+test('cancellation clears an armed deadline and cannot later seek or pause a new audition', () => {
+  const h = harness(); h.begin(); h.frame(3);
+  h.window.dispatchEvent(new Event(events.CANCEL_AUDITION_EVENT));
+  assert.equal(h.timerCount(), 0);
+  const pauses = h.pauses(); h.advanceTimers(4);
+  assert.equal(h.pauses(), pauses); assert.deepEqual(h.seeks, [3]);
 });

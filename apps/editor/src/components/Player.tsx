@@ -214,7 +214,12 @@ export function Player() {
   });
   const windowBoundsRef = useRef({ start: windowStart, end: windowEnd, source: videoUrl });
   windowBoundsRef.current = { start: windowStart, end: windowEnd, source: videoUrl };
+  const auditionBoundary = useRef<(time: number) => number | null>(() => null);
   const audioPlaybackClock = useCallback(() => {
+    const bounded = (time: number, running: boolean) => {
+      const end = auditionBoundary.current(time);
+      return end === null ? { time, playing: running } : { time: end, playing: false };
+    };
     // With a ready native mix, audio owns the transport. Video decoding and
     // segment handoffs must not pause or rewind a healthy sound stream.
     if (mode === "video" && (nativeAudioRef.current || audioTransportRef.current.active) && playingRef.current && !scrubbingRef.current) {
@@ -228,16 +233,17 @@ export function Player() {
       }
       // Wall time can outrun the actual audio device under load. Use the
       // graph's clock so healthy voices are never repeatedly seeked forward.
-      return { time: Math.min(mediaEndSecs, transport.time + now - transport.started), playing: true };
+      return bounded(Math.min(mediaEndSecs, transport.time + now - transport.started), true);
     }
     audioTransportRef.current.active = false;
     if (scrubbingRef.current) return { time: playheadRef.current, playing: false };
-    if (mode !== "video" || !playingRef.current || scrubbingRef.current) return null;
+    if (mode !== "video") return null;
+    if (!playingRef.current) return { time: playheadRef.current, playing: false };
     const video = videoRef.current;
     if (!video || video.readyState < 2 || video.dataset.previewSource !== windowBoundsRef.current.source)
       return { time: playheadRef.current, playing: false };
-    return { time: windowBoundsRef.current.start + video.currentTime,
-      playing: !video.paused && !video.seeking && !bufferingRef.current && video.readyState >= 3 };
+    return bounded(windowBoundsRef.current.start + video.currentTime,
+      !video.paused && !video.seeking && !bufferingRef.current && video.readyState >= 3);
   }, [mode, mediaEndSecs]);
   useEffect(() => {
     let frame = 0;
@@ -619,6 +625,7 @@ export function Player() {
     let frame = 0, lastPublished = -Infinity;
     const tick = (now: number) => {
       const clock = audioPlaybackClock();
+      if (!playingRef.current) return; // A boundary/cancel may stop us inside the clock read.
       if (clock && now - lastPublished >= 1000 / 30) {
         lastPublished = now;
         let time = clock.time;
@@ -771,7 +778,7 @@ export function Player() {
     togglePlay();
   };
 
-  useTranscriptAudition({
+  auditionBoundary.current = useTranscriptAudition({
     projectId: currentId, sequenceId: project?.sequence.id, revision: state.revision,
     end: mediaEndSecs, playhead, scrubbing: state.scrubbing, video: videoRef,
     windowStart, clock: audioPlaybackClock, seekVersion: state.playheadSeekVersion,
@@ -789,6 +796,7 @@ export function Player() {
       videoRef.current?.pause();
     },
     seek: time => {
+      playheadRef.current = time;
       reportedVideoTimeRef.current = time;
       setVideoTime(time);
       const video = videoRef.current;
