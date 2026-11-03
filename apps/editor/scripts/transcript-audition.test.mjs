@@ -164,3 +164,18 @@ test('cancellation clears an armed deadline and cannot later seek or pause a new
   const pauses = h.pauses(); h.advanceTimers(4);
   assert.equal(h.pauses(), pauses); assert.deepEqual(h.seeks, [3]);
 });
+
+test('deadline observation cannot activate a device clock before the normal transport driver', () => {
+  const h = harness(); let activations = 0;
+  h.render({ clock: (initialize = true) => {
+    if (initialize) activations++;
+    return { time: 3, playing: false };
+  } });
+  h.begin(); h.frame(3);
+  h.advanceTimers(3.1);
+  assert.equal(activations, 0);
+  h.frame(3.11);
+  assert.ok(activations > 0); // Ordinary transport work is allowed to start it.
+  h.window.dispatchEvent(new Event(events.CANCEL_AUDITION_EVENT));
+  assert.equal(h.timerCount(), 0);
+});

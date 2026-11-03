@@ -103,9 +103,11 @@ test(`transcript audition stops actual video and native audio at the selected wo
     const captured: HTMLAudioElement[] = []; (window as any).__transcriptAudio = captured;
     const Original = window.Audio;
     (window as any).__nativePauseTimes = [];
+    (window as any).__nativePlayTimes = [];
     window.Audio = new Proxy(Original, { construct(target, args) {
       const audio = Reflect.construct(target, args) as HTMLAudioElement;
-      const pause = audio.pause.bind(audio);
+      const pause = audio.pause.bind(audio), play = audio.play.bind(audio);
+      audio.play = () => { (window as any).__nativePlayTimes.push(audio.currentTime); return play(); };
       audio.pause = () => { if (!audio.paused) (window as any).__nativePauseTimes.push(audio.currentTime); pause(); };
       captured.push(audio); return audio;
     } });
@@ -128,17 +130,20 @@ test(`transcript audition stops actual video and native audio at the selected wo
   });
   await panel.locator('select').selectOption('words'); await panel.getByRole('button', { name: '你好', exact: true }).click();
   await panel.getByRole('button', { name: '试听 3.00–3.50 秒', exact: true }).click();
-  await expect.poll(() => page.evaluate(() => (window as any).__transcriptAudio.some((audio: HTMLAudioElement) => !audio.paused && audio.currentTime >= 3))).toBe(true);
+  await expect.poll(() => page.evaluate(() => (window as any).__transcriptAudio.some((audio: HTMLAudioElement) => !audio.paused && audio.currentTime >= 3)), { intervals: [10, 20, 30] }).toBe(true);
   await expect(page.locator('.player__play')).toHaveAttribute('aria-label', '播放');
   await expect.poll(() => page.evaluate(() => (window as any).__transcriptAudio.every((audio: HTMLAudioElement) => audio.paused))).toBe(true);
   await expect.poll(() => page.evaluate(() => (window as any).__transport.at(-1)?.time)).toBe(3.5);
   await expect(page.locator('.statusbar__msg')).toHaveText('已暂停');
   const stopped = await page.evaluate(() => ({ audio: (window as any).__transcriptAudio.map((audio: HTMLAudioElement) => audio.currentTime),
     submitted: (window as any).__transport.filter((value: any) => value.playing && value.time >= 3).map((value: any) => value.time),
-    nativePauses: (window as any).__nativePauseTimes.filter((time: number) => time >= 3) }));
+    nativePauses: (window as any).__nativePauseTimes.filter((time: number) => time >= 3),
+    nativeStarts: (window as any).__nativePlayTimes.filter((time: number) => time >= 3) }));
   expect(stopped.submitted.some((time: number) => time > 3.1)).toBe(true);
   expect(Math.max(...stopped.submitted)).toBeLessThan(3.58);
   expect(stopped.audio.every((time: number) => Math.abs(time - 3.5) < .1)).toBe(true);
+  expect(stopped.nativeStarts.length).toBeGreaterThan(0);
+  expect(Math.min(...stopped.nativeStarts)).toBeLessThan(3.08);
   expect(stopped.nativePauses.length).toBeGreaterThan(0);
   expect(Math.max(...stopped.nativePauses)).toBeLessThan(3.58);
   await page.screenshot({ path: '../../.artifacts/transcript-word-review.png' });

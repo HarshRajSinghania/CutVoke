@@ -6,7 +6,7 @@ interface Options {
   end: number; playhead: number; scrubbing: boolean;
   video: RefObject<HTMLVideoElement | null>;
   windowStart: number;
-  clock: () => { time: number; playing: boolean } | null;
+  clock: (initialize?: boolean) => { time: number; playing: boolean } | null;
   seekVersion: number;
   play: () => void;
   pause: () => void;
@@ -81,7 +81,7 @@ export function useTranscriptAudition(options: Options) {
           if (!target) return;
           const now = latest.current;
           if (now.projectId !== target.projectId || now.sequenceId !== target.sequenceId || now.revision !== target.revision) { stop(); return; }
-          const clock = now.clock(), video = now.video.current;
+          const clock = now.clock(false), video = now.video.current;
           if (!active.current) return; // The shared clock may have stopped us.
           const time = clock?.time ?? (video && !video.paused ? now.windowStart + video.currentTime : now.playhead);
           if (stopAtBoundary(time) !== null) return;
