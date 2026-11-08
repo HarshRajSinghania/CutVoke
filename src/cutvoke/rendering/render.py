@@ -3727,7 +3727,13 @@ class RenderService:
                 # Keep offsets and the half-open interval on the sequence
                 # frame grid. Microsecond rounding can erase a one-frame clip
                 # or retain it into the next shot at fractional frame times.
-                active = f"gte(n,{first_frame})*lt(n,{end_frame})"
+                # FFmpeg 6 evaluates timeline enable on both inputs. A delayed
+                # secondary's local `n` can overwrite the canvas counter and
+                # disable the rest of a valid video shot. Both inputs carry
+                # sequence PTS here; recover its integer frame without rounding
+                # fractional-rate boundaries to decimal seconds.
+                sample = f"round(t*({fps_expr}))"
+                active = f"gte({sample},{first_frame})*lt({sample},{end_frame})"
                 parts.append(
                     f"[{current}][{shifted}]overlay=shortest=0:eof_action=pass:"
                     f"repeatlast=0:format=auto:enable='{active}'[{out}]")

@@ -63,17 +63,27 @@ def test_cut_to_alpha_clears_expired_source_in_export_and_preview(tmp_path, fps,
 
 @pytest.mark.parametrize("rate", [(24,1), (30,1), (60,1), (30000,1001)])
 @pytest.mark.parametrize("leading_frames", [0,2])
-def test_single_frame_cuts_use_half_open_sequence_frame_intervals(tmp_path, rate, leading_frames):
+@pytest.mark.parametrize("source_kind", ["image", "video"])
+def test_single_frame_cuts_use_half_open_sequence_frame_intervals(tmp_path, rate, leading_frames, source_kind):
     fps = R.of(*rate)
     def at(frame):
         return R.of(frame*rate[1], rate[0])
     paths = {}
+    renderer = RenderService(gpu_effects=False)
     for name, color in (("blue", (0,0,255,255)), ("red", (255,0,0,255)), ("alpha", (0,0,0,0))):
         path = tmp_path / (name + ".png")
         picture = Image.new("RGBA", (64,64), color)
         if name == "alpha":
             ImageDraw.Draw(picture).rectangle((20,20,43,43), fill=(0,255,0,255))
         picture.save(path)
+        if source_kind == "video" and name != "blue":
+            video = tmp_path / (name + ".mov")
+            subprocess.run([renderer.ffmpeg, "-v", "error", "-loop", "1",
+                            "-framerate", f"{rate[0]}/{rate[1]}", "-i", str(path),
+                            "-frames:v", "8", "-an", "-c:v", "prores_ks",
+                            "-profile:v", "4", "-pix_fmt", "yuva444p10le", str(video)],
+                           check=True, timeout=30)
+            path = video
         paths[name] = AssetReference(name, str(path))
     project = EditService().create_project("single-frame-alpha", width=64, height=64, fps=fps)
     project.sequence.tracks = [
@@ -83,7 +93,6 @@ def test_single_frame_cuts_use_half_open_sequence_frame_intervals(tmp_path, rate
             Clip("alpha", paths["alpha"], at(leading_frames+1), at(leading_frames+2), at(0)),
         ]),
     ]
-    renderer = RenderService(gpu_effects=False)
     output = tmp_path / "single-frame.mp4"
     renderer.render(project, str(output), quality="high")
     raw = subprocess.run([renderer.ffmpeg,"-v","error","-i",str(output),"-pix_fmt","rgb24","-f","rawvideo","-"],
