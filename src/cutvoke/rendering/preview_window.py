@@ -95,7 +95,9 @@ def bounded(project, window, renderer):
                     return project, {}, None
     fps = project.sequence.fps.to_fraction()
     origin_frame = max(0, math.floor(start * float(fps) + 1e-7) - history)
-    trim_origin = origin_frame / float(fps)
+    # Match _static_frame_time's exact frame-to-time conversion. Dividing by
+    # float(fps) can move this origin just beyond the requested NTSC frame.
+    trim_origin = float(origin_frame / fps)
     origin = min([trim_origin, *retained_starts])
     snapshot = copy.deepcopy(project)
     clocks = {}

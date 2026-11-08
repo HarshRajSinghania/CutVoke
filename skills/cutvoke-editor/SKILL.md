@@ -42,6 +42,14 @@ Read [editing.md](references/editing.md) for source selection and operation mapp
 Discover supported effects with `effects_list` / `resources_list`. Before unfamiliar commands request `editor_help(topic="command", command="…")`, adding `effectId` for its exact schema. These schemas describe the payload, not outer `command_apply` arguments. Never invent controls, IDs or automatic recognition/generation features.
 
 For externally rendered code scenes, read `editor_help(topic="generated-media")`.
+
+For parameter changes or local frame windows, also read
+`editor_help(topic="generated-render")`. Use `generated_render` plan/register/status;
+save the effective request/key, use an independently trusted external renderer
+on a miss, and use returned `mediaSourceStart` on a covering cache hit. Source
+execution is disabled. Keep native titles/audio editable; preview an atomic
+split/trim/swap batch for a local repair. Source archives and the cache index
+remain outside `.cvkpkg`. See [request/cache details](../../docs/user/generated-render.md).
 `generated_media` statically inspects/imports a hashed source/output manifest;
 it never executes code or edits the timeline. Use the returned ordinary asset
 with `clip.insert` or explicit `asset.swap` targets. Preserve native text/audio

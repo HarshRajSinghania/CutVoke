@@ -243,6 +243,8 @@ MCP 自带 `editor_help`，支持当前命令、单位、范例与恢复；`topi
 
 外部代码渲染素材可通过 `generated_media` 校验源码/输出哈希与帧合同后导入，并保留独立、不会自动执行的源码 ZIP。原生文字、音轨与指定片段替换继续可编辑。先读 `editor_help(topic="generated-media")`，再跑[离线桥接示例](examples/generated-media/README.md)。源码 ZIP 须与工程包分开交付；桥接不执行代码，也不认证艺术效果。
 
+参数调整与局部帧修复可使用 [`generated_render`](docs/user/generated-render.md)：在输出存在前校验有界参数与渲染请求，复用经过哈希验证的相同或覆盖帧窗口，登记外部渲染结果，并返回预览调用和精确的素材入点供原生剪辑使用。产品仍不执行源代码；[可复现示例](examples/generated-media/README.md#parameterized-cache-and-local-frame-repair)使用原创素材实测冷渲染、缓存复用与局部重渲。缓存淘汰只删除索引，源码归档须单独交付。
+
 标准 MCP 启动入口会自动切换到通过检查的新引擎，保持连接和已提交的渲染任务。详见[自动更新行为与边界](docs/production-workflow.md#runtime-changes--服务版本变化)；之前已经运行的旧启动器首次接入时需要重连一次。
 
 源码版仅使用 MCP 时，可运行 `python -m cutvoke doctor --mcp-only --json`，无需构建浏览器编辑器。能力发现先用 `editor_help`，再用 `commands_list(includeSchemas=false)` 搜索轻量命令索引，用 `editor_help(topic="command", command="…")` 获取选定命令的 payload schema。效果查询使用 `effects_list`；`capabilities` 返回较大的完整快照。详见[安装诊断](docs/user/installation.md)。
