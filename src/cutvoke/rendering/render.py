@@ -3715,9 +3715,13 @@ class RenderService:
                     f"[{label}]trim=duration={clip_durs[i]:.6f},"
                     f"setpts=PTS-STARTPTS+{offset:.6f}/TB{clock}[{shifted}]")
                 out = f"tlmix{n}_{i}"
+                # Framesync can retain an expired secondary picture even with
+                # eof_action=pass/repeatlast=0. The native clip interval, not
+                # that retained frame, decides when this shot is visible.
+                active = f"gte(t,{offset:.6f})*lt(t,{offset + clip_durs[i]:.6f})"
                 parts.append(
                     f"[{current}][{shifted}]overlay=shortest=0:eof_action=pass:"
-                    f"format=auto[{out}]")
+                    f"repeatlast=0:format=auto:enable='{active}'[{out}]")
                 current = out
             out_label = f"vtk{n}"
             parts.append(f"[{current}]null[{out_label}]")

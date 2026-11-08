@@ -206,6 +206,9 @@ def main():
             assert pixels(second)[280, 110, 1] > 180 and pixels(second)[280, 110, 0] < 100
         assert pixels(4.5)[280, 110, 0] > 220 and pixels(4.5)[280, 110, 1] > 110
         assert np.max(np.abs(pixels(7.5)[330, 20].astype(int) - [12, 18, 30])) < 12
+        # A transparent corner alone cannot detect the expired chart lingering
+        # behind the annotation. Check the previous bar's occupied region too.
+        assert np.max(np.abs(pixels(7.5)[280, 110].astype(int) - [12, 18, 30])) < 12
         pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", str(video), "-vn", "-ac", "1", "-ar", "48000", "-f", "f32le", "pipe:1"],
                              capture_output=True, check=True).stdout
         samples = np.frombuffer(pcm, dtype="<f4")
@@ -226,6 +229,7 @@ def main():
                   "checks": {"warmCacheAfterExternalOutputDeletion": True, "coveringOffset": True, "changedFields": revised["changedFields"],
                       "absoluteRawFrameHashesEqualFullSlice": True, "atomicLocalRepairUndoRedo": True,
                       "unchangedOutsideRepairPixels": True, "repairedPixels": True, "alphaCompositeCorner": True,
+                      "expiredShotClearedBehindAlpha": True,
                       "nativeTitlePreserved": True, "audioNonSilentUnclippedFades": True, "fullDecode216Frames": True, "packageRoundtrip": True},
                   "unassessed": ["continuous visual playback", "subjective listening", "artistic quality", "hostile renderer isolation", "cross-machine reproducibility"]}
         write_json(evidence / "result.json", result)
