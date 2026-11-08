@@ -19,6 +19,7 @@ from cutvoke.editing.service import EditError
 from cutvoke.editing.effect_modules import RECIPE_SCHEMA, PRIVACY
 from cutvoke.interfaces.creative_guides import GUIDE_FILES
 from cutvoke.interfaces.creative_workflow import TOOL as CREATIVE_TOOL, CreativeWorkflow
+from cutvoke.interfaces.generated_render import TOOL as GENERATED_RENDER_TOOL
 
 
 def _tool(name, description, properties, required=()):
@@ -34,6 +35,7 @@ PROJECT = {"projectId": STRING}
 REVISION = {**PROJECT, "expectedRevision": STRING}
 AGENT_TOOLS = [
     CREATIVE_TOOL,
+    GENERATED_RENDER_TOOL,
     _tool('transition_preview', 'Render quarter/middle/three-quarter transition pictures, optionally beside a plain dissolve. Read-only; returns at most six PNGs and their revision, without changing the project.',
           {**REVISION,'clipId':STRING,'fractions':{'type':'array','minItems':1,'maxItems':3,
              'items':{'type':'number','minimum':.05,'maximum':.95}},
@@ -45,7 +47,7 @@ AGENT_TOOLS = [
     _tool("project_directory_open", "Open/register a moved or backed-up project directory, or its project.cutvoke file. An existing online copy with the same projectId must be closed and moved first.",
           {"path": STRING}, ("path",)),
     _tool("editor_help", "START HERE if unfamiliar with CutVoke. Default {} gives compact onboarding. For substantial creative work topic=creative gives a small three-layer index; add guide=<id> to load one principle/work-type/project-plan reference. Local corrections stay local. No external Skill/source-code access needed. Before unfamiliar edits request topic=command with command name and effectId for exact params.",
-          {"topic": {"type": "string", "enum": ["overview", "creative", "time", "editing", "errors", "recipes", "command", "sharing", "local-models", "agent-bridge", "generated-media"], "default": "overview"},
+          {"topic": {"type": "string", "enum": ["overview", "creative", "time", "editing", "errors", "recipes", "command", "sharing", "local-models", "agent-bridge", "generated-media", "generated-render"], "default": "overview"},
            "guide": {"type": "string", "enum": list(GUIDE_FILES)},
            "command": STRING, "effectId": STRING, "recipe": STRING}),
     _tool("effect_module_save", "Save a content-free reusable effect recipe locally (MIT). No project/media/text inputs accepted. Discover allowed schemas with effect_module_list(includeSchemas=true). Return privacyNotice verbatim to the user when proposing sharing.",
@@ -323,6 +325,10 @@ class AgentTools:
                     Path(self.api.media_dir) / ".generated", result["bundleId"])
                 result.update({"asset": asset, "sourceArchive": archive})
             return result
+
+    def generated_render(self, a):
+        from cutvoke.interfaces.generated_render import GeneratedRender
+        return GeneratedRender(self).call(a)
 
     def _source(self, a):
         if bool(a.get("assetId")) == bool(a.get("path")):
