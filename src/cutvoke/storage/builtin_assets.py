@@ -7,6 +7,7 @@
 - 每个内置资产用**确定性的 asset_id**（`builtin_audio_<文件 stem>`），重跑
   ensure_builtin_audio() 走 add_asset 的 ON CONFLICT upsert，不会新增重复行。
 - 路径/时长/声道等元数据每次启动重新探测并刷新（包移动后路径自动自愈）。
+- 受支持 WAV/图像直接读取元数据；其余格式或不支持的文件保留媒体探测回退。
 - 只动 builtin 资产，绝不触碰用户资产（用户资产 asset_id 不以 builtin_audio_
   前缀，且本函数只 upsert 自己生成的 id）。
 
@@ -25,6 +26,7 @@ import os
 import logging
 from pathlib import Path
 from typing import Optional
+import wave
 
 from cutvoke.rendering.render import RenderService, RenderError
 from cutvoke.storage.builtin_stickers import load_builtin_stickers
@@ -122,9 +124,6 @@ def ensure_builtin_audio(store, render: Optional[RenderService] = None) -> list[
         return []
     if not os.path.isdir(AUDIO_DIR):
         return []
-    if render is None:
-        render = RenderService()
-
     registered: list[dict] = []
     for fname in sorted(os.listdir(AUDIO_DIR)):
         lower = fname.lower()
@@ -143,7 +142,18 @@ def ensure_builtin_audio(store, render: Optional[RenderService] = None) -> list[
         duration: Optional[float] = None
         has_audio = True
         try:
-            info = render.probe_media(path)
+            # Bundled PCM WAVs need no child process. Keep the decoder path
+            # for compressed/unsupported formats and malformed WAV headers.
+            try:
+                if not lower.endswith(".wav"):
+                    raise wave.Error("not a WAV input")
+                with wave.open(path, "rb") as audio:
+                    info = {"duration": audio.getnframes() / audio.getframerate(),
+                            "has_audio": audio.getnchannels() > 0}
+            except (wave.Error, EOFError, OSError):
+                if render is None:
+                    render = RenderService()
+                info = render.probe_media(path)
             duration = info.get("duration") or None
             has_audio = bool(info.get("has_audio", True))
         except RenderError:
@@ -240,9 +250,6 @@ def ensure_builtin_backgrounds(
     """Register built-in and active-pack composition backgrounds as image assets."""
     if store is None:
         return []
-    if render is None:
-        render = RenderService()
-
     from cutvoke.storage.resource_pack import (
         file_matches_sha256,
         install_immutable_resource_file,
@@ -253,7 +260,7 @@ def ensure_builtin_backgrounds(
     builtin_root = Path(__file__).resolve().parent.parent
     roots = list(dict.fromkeys((builtin_root, Path(package_root).resolve()
                                 if package_root is not None else builtin_root)))
-    resources_by_id: dict[str, tuple[Path, dict, dict]] = {}
+    resources_by_id: dict[str, tuple[Path, dict, dict, dict]] = {}
     for root in roots:
         try:
             manifest = load_resource_pack_manifest(root)
@@ -278,10 +285,10 @@ def ensure_builtin_backgrounds(
             if not source.is_relative_to(root.resolve()) or not file_matches_sha256(
                     source, record["sha256"], record.get("sizeBytes")):
                 continue
-            resources_by_id[asset_id] = (root, resource, record)
+            resources_by_id[asset_id] = (root, manifest, resource, record)
 
     registered: list[dict] = []
-    for asset_id, (root, resource, record) in sorted(resources_by_id.items()):
+    for asset_id, (root, manifest, resource, record) in sorted(resources_by_id.items()):
         relative_path = next(path for path in resource["mediaFiles"]
                              if isinstance(path, str)
                              and path.startswith("assets/backgrounds/")
@@ -292,8 +299,8 @@ def ensure_builtin_backgrounds(
             try:
                 path = install_immutable_resource_file(
                     source, immutable_root,
-                    pack_id=load_resource_pack_manifest(root)["packId"],
-                    pack_version=load_resource_pack_manifest(root)["version"],
+                    pack_id=manifest["packId"],
+                    pack_version=manifest["version"],
                     relative_path=relative_path,
                     expected_sha256=record["sha256"],
                     expected_size=record.get("sizeBytes"),
@@ -305,7 +312,15 @@ def ensure_builtin_backgrounds(
         size = os.path.getsize(path)
         width = height = None
         try:
-            info = render.probe_media(str(path))
+            from PIL import Image
+            try:
+                with Image.open(path) as image:
+                    info = {"width": image.width, "height": image.height}
+                    image.verify()
+            except (OSError, ValueError, SyntaxError, Image.DecompressionBombError):
+                if render is None:
+                    render = RenderService()
+                info = render.probe_media(str(path))
             width = info.get("width")
             height = info.get("height")
         except RenderError:
