@@ -237,5 +237,5 @@ def test_register_rejects_mismatched_frames_and_bytes(case, media):
     assert not result["ok"] and "frame count" in result["error"]["message"]
     args["renderSha256"] = "0" * 64
     result = server.call_tool("generated_render", args)
-    assert not result["ok"] and "hash" in result["error"]["message"].lower()
+    assert not result["ok"] and result["error"]["message"] == "SHA256 mismatch: blue.mp4"
     assert call("status")["cache"]["entries"] == 0
