@@ -3709,16 +3709,25 @@ class RenderService:
                 f"r={fps_expr}:d={total_dur:.6f},format=rgba[{bed}]")
             current = bed
             for i, (label, offset) in enumerate(zip(clip_labels, offsets)):
+                first_frame = math.ceil(offset * float(fps) - 1e-7)
+                end_frame = math.ceil((offset + clip_durs[i]) * float(fps) - 1e-7)
+                if end_frame <= first_frame:
+                    parts.append(f"[{label}]trim=end_frame=0,nullsink")
+                    continue
                 shifted = f"tlclip{n}_{i}"
                 clock = f",fps={fps_expr}" if _setpts_clears_frame_rate(self.ffmpeg) else ""
                 parts.append(
-                    f"[{label}]trim=duration={clip_durs[i]:.6f},"
-                    f"setpts=PTS-STARTPTS+{offset:.6f}/TB{clock}[{shifted}]")
+                    f"[{label}]trim=end_frame={end_frame - first_frame},"
+                    f"settb=expr=1/({fps_expr}),"
+                    f"setpts=PTS-STARTPTS+{first_frame}{clock}[{shifted}]")
                 out = f"tlmix{n}_{i}"
                 # Framesync can retain an expired secondary picture even with
                 # eof_action=pass/repeatlast=0. The native clip interval, not
                 # that retained frame, decides when this shot is visible.
-                active = f"gte(t,{offset:.6f})*lt(t,{offset + clip_durs[i]:.6f})"
+                # Keep offsets and the half-open interval on the sequence
+                # frame grid. Microsecond rounding can erase a one-frame clip
+                # or retain it into the next shot at fractional frame times.
+                active = f"gte(n,{first_frame})*lt(n,{end_frame})"
                 parts.append(
                     f"[{current}][{shifted}]overlay=shortest=0:eof_action=pass:"
                     f"repeatlast=0:format=auto:enable='{active}'[{out}]")

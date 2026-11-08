@@ -109,3 +109,36 @@ def test_background_decoder_fallback_and_bad_hash_exclusion(store, tmp_path, mon
     registered = assets.ensure_builtin_backgrounds(store, Decoder(), immutable_root=tmp_path / "immutable")
     assert len(registered) == 41 and store.get_asset(rejected["resourceId"]) is None
     assert all((item["width"], item["height"]) == (160, 96) for item in registered)
+
+
+def test_truncated_wav_does_not_trust_declared_frame_count(store, tmp_path, monkeypatch):
+    path = tmp_path / "chime.wav"
+    with wave.open(str(path), "wb") as stream:
+        stream.setparams((1, 2, 8000, 0, "NONE", "not compressed"))
+        stream.writeframes(b"\x01\x00" * 8000)
+    path.write_bytes(path.read_bytes()[:44+800])  # Header says 1s; only 0.05s remains.
+    monkeypatch.setattr(assets, "AUDIO_DIR", str(tmp_path))
+    decoder = RenderService()
+    expected = decoder.probe_media(str(path))
+    calls = []
+    class Decoder:
+        def probe_media(self, value):
+            calls.append(value)
+            return decoder.probe_media(value)
+    registered = assets.ensure_builtin_audio(store, Decoder())
+    assert expected["duration"] == pytest.approx(.05, abs=1e-6)
+    assert registered[0]["duration"] == expected["duration"]
+    assert calls == [str(path)]
+
+
+def test_image_eof_uses_decoder_fallback(store, tmp_path, monkeypatch):
+    from PIL import Image
+    def truncated(path):
+        raise EOFError("fixture image decoder encountered truncated data")
+    monkeypatch.setattr(Image, "open", truncated)
+    class Decoder:
+        def probe_media(self, path):
+            return {"width": 160, "height": 96}
+    registered = assets.ensure_builtin_backgrounds(store, Decoder(), immutable_root=tmp_path / "immutable")
+    assert len(registered) == 42
+    assert all((item["width"], item["height"]) == (160, 96) for item in registered)

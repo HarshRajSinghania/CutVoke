@@ -239,3 +239,97 @@ def test_register_rejects_mismatched_frames_and_bytes(case, media):
     result = server.call_tool("generated_render", args)
     assert not result["ok"] and result["error"]["message"] == "SHA256 mismatch: blue.mp4"
     assert call("status")["cache"]["entries"] == 0
+
+
+def test_truncated_external_output_rejects_without_publishing_then_retries(case, media):
+    root, path, _, service, server, call, _ = case
+    planned = call()
+    video = root/"external.mp4"
+    complete = (media/"blue.mp4").read_bytes()
+    video.write_bytes(complete[:len(complete)//2])
+    args = dict(projectId="one",operation="register",requestPath=str(path),
+                expectedRequestKey=planned["requestKey"],renderPath=str(video),renderSha256=sha(video))
+    before = copy.deepcopy(service.get_project("one").to_dict())
+    rejected = server.call_tool("generated_render",args)
+    assert not rejected["ok"]
+    assert call("status")["cache"]["entries"]==0
+    assert not [a for a in service.store._target("one").list_assets() if not a.get("builtin")]
+    video.write_bytes(complete)
+    args["renderSha256"]=sha(video)
+    ready = server.call_tool("generated_render",args)
+    assert ready["ok"] and ready["registered"] and ready["cache"]["hit"]
+    assert service.get_project("one").to_dict()==before
+
+
+def test_interrupted_import_cleans_snapshot_and_same_request_can_retry(case, media, monkeypatch):
+    _, path, _, service, server, call, _ = case
+    planned=call()
+    video=media/"blue.mp4"
+    args=dict(projectId="one",operation="register",requestPath=str(path),expectedRequestKey=planned["requestKey"],
+              renderPath=str(video),renderSha256=sha(video))
+    partial=[]
+    def interrupt(source,target,expected,limit):
+        target.write_bytes(b"interrupted partial output")
+        partial.append(target)
+        raise KeyboardInterrupt("fixture graceful process interruption during copy")
+    with monkeypatch.context() as patch:
+        patch.setattr("cutvoke.interfaces.generated_render._copy_checked",interrupt)
+        with pytest.raises(KeyboardInterrupt):
+            server.call_tool("generated_render",args)
+    assert partial and not partial[0].exists()
+    assert call("status")["cache"]["entries"]==0
+    assert not [a for a in service.store._target("one").list_assets() if not a.get("builtin")]
+    ready=server.call_tool("generated_render",args)
+    assert ready["ok"] and ready["registered"]
+    assert service.get_project("one").revision=="0"
+
+
+def test_cache_index_failure_after_import_is_retryable_without_duplicate_media(case, media, monkeypatch):
+    _, path, _, service, server, call, _ = case
+    planned=call()
+    video=media/"blue.mp4"
+    args=dict(projectId="one",operation="register",requestPath=str(path),expectedRequestKey=planned["requestKey"],
+              renderPath=str(video),renderSha256=sha(video))
+    def fail(*args,**kwargs):
+        raise OSError("fixture interrupted cache write after media/archive import")
+    with monkeypatch.context() as patch:
+        patch.setattr(GeneratedRenderCache,"record",fail)
+        rejected=server.call_tool("generated_render",args)
+        assert not rejected["ok"] and "fixture interrupted" in rejected["error"]["message"]
+    imported=[a for a in service.store._target("one").list_assets() if not a.get("builtin")]
+    assert len(imported)==1 and call("status")["cache"]["entries"]==0
+    ready=server.call_tool("generated_render",args)
+    assert ready["ok"] and ready["assetId"]==imported[0]["assetId"] and ready["cache"]["hit"]
+    assert len([a for a in service.store._target("one").list_assets() if not a.get("builtin")])==1
+    assert len(list(Path(ready["receipt"]["sourceArchive"]["path"]).parent.glob("*.cvsource.zip")))==1
+    assert service.get_project("one").revision=="0"
+
+
+def test_old_result_does_not_auto_replace_and_deleted_target_rejects_late_swap(case):
+    _, _, _, service, server, call, register=case
+    old=register()
+    new=register("red",params={"accent":"red"})
+    lease=server.call_tool("edit_lock",dict(projectId="one",action="acquire",owner="late-render-test"))["lease"]["leaseId"]
+    def apply(kind,payload,revision,identifier):
+        return server.call_tool("command_apply",dict(projectId="one",editLeaseId=lease,expectedRevision=revision,
+                                commandId=identifier,type=kind,payload=payload))
+    try:
+        inserted=apply("clip.insert",dict(trackId="v",createTrackKind="video",clipId="target",assetId=new["assetId"],
+                       timelineStart={"num":"0","den":"1"},timelineEnd={"num":"1","den":"1"}),"0","insert-new")
+        assert inserted["ok"]
+        before=copy.deepcopy(service.get_project("one").to_dict())
+        late=register()  # A valid older request may still enter the media ledger.
+        assert late["assetId"]==old["assetId"] and late["assetId"]!=new["assetId"]
+        assert service.get_project("one").to_dict()==before
+        payload=dict(clipIds=["target"],assetId=late["assetId"])
+        preview=server.call_tool("command_preview",dict(projectId="one",expectedRevision="1",type="asset.swap",payload=payload))
+        assert preview["ok"] and service.get_project("one").to_dict()==before
+        assert apply("clip.remove",dict(clipId="target"),"1","delete-target")["ok"]
+        after_delete=copy.deepcopy(service.get_project("one").to_dict())
+        stale=apply("asset.swap",payload,"1","late-stale")
+        assert not stale["ok"] and stale["error"]["code"]=="REVISION_CONFLICT"
+        gone=apply("asset.swap",payload,"2","late-missing")
+        assert not gone["ok"] and gone["error"]["code"]=="INVALID_ARGUMENT"
+        assert service.get_project("one").to_dict()==after_delete
+    finally:
+        server.call_tool("edit_lock",dict(projectId="one",action="release",leaseId=lease))

@@ -147,7 +147,10 @@ def ensure_builtin_audio(store, render: Optional[RenderService] = None) -> list[
             try:
                 if not lower.endswith(".wav"):
                     raise wave.Error("not a WAV input")
-                with wave.open(path, "rb") as audio:
+                with open(path, "rb") as stream, wave.open(stream, "rb") as audio:
+                    declared_bytes = audio.getnframes() * audio.getnchannels() * audio.getsampwidth()
+                    if declared_bytes > os.fstat(stream.fileno()).st_size - stream.tell():
+                        raise EOFError("WAV data is shorter than its declared frame count")
                     info = {"duration": audio.getnframes() / audio.getframerate(),
                             "has_audio": audio.getnchannels() > 0}
             except (wave.Error, EOFError, OSError):
@@ -317,7 +320,7 @@ def ensure_builtin_backgrounds(
                 with Image.open(path) as image:
                     info = {"width": image.width, "height": image.height}
                     image.verify()
-            except (OSError, ValueError, SyntaxError, Image.DecompressionBombError):
+            except (OSError, EOFError, ValueError, SyntaxError, Image.DecompressionBombError):
                 if render is None:
                     render = RenderService()
                 info = render.probe_media(str(path))
