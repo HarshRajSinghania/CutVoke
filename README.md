@@ -20,6 +20,22 @@
 
 </div>
 
+<p align="center">
+  <img src="examples/showcases/chase-the-light/previews/motorcycle-case_en.gif" alt="Raw AI-generated shots, then the finished CutVoke edit" width="92%" />
+</p>
+
+> **CutVoke is an open-source, local video editor your AI agent can drive over MCP — and you can open the same timeline and fix anything by hand.**
+> Instagram's new Edits for Mac also exposes an MCP server, but it is macOS-only (Apple silicon) and needs an Instagram sign-in. CutVoke runs on **Windows · macOS · Linux**, needs no account for local editing, and its source is MIT-licensed.
+> Works with Claude Code, Codex, Cursor, Claude Desktop, or any MCP client.
+
+**Connect your agent in 30 seconds**
+
+1. [Download CutVoke v0.3.5](https://github.com/frankShan001/CutVoke/releases/tag/v0.3.5) and launch it once.
+2. Open `profile/mcp-config.json` in the CutVoke data folder (Windows: `CutVoke Data` next to the exe · macOS: `~/Library/Application Support/CutVoke/` · Linux: `~/.local/share/CutVoke/`). It already contains the bundled engine command, so no Python install is needed.
+3. Add the `cutvoke` entry to your agent: [Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md). Then ask: *"Cut the silences, add captions, make a 9:16 version, and show me a few frames before you export."*
+
+⭐ **If CutVoke is useful to you, a star helps other creators find it.**
+
 ## What's New in v0.3.5
 
 - **Transcript-Driven Editing**: Locate, audition, and delete clips by word or sentence with impact preview and single-step synced undo.
@@ -33,7 +49,7 @@
 <p>
   <a href="https://www.bilibili.com/video/BV18VHA62EZ1/"><img src="docs/images/readme/platform-links/bilibili.svg" alt="Bilibili" width="140" height="44" /></a>
   &nbsp;
-  <a href="https://www.youtube.com/watch?v=2--4_XO1SRI"><img src="docs/images/readme/platform-links/youtube.svg" alt="YouTube" width="148" height="44" /></a>
+  <a href="https://www.youtube.com/watch?v=2--4_XO15RI"><img src="docs/images/readme/platform-links/youtube.svg" alt="YouTube" width="148" height="44" /></a>
 </p>
 
 ## Why CutVoke?
@@ -151,20 +167,21 @@ No Python or Node.js setup required. Download the latest pre-built package for y
 
 ### Option 2: Connect Your AI Agent (Claude Desktop / Cursor / MCP Clients)
 
-1. Add CutVoke to your MCP client configuration (e.g., `claude_desktop_config.json` or `.cursor/mcp.json`):
+1. Launch the desktop app once. It writes `profile/mcp-config.json` in the CutVoke data folder with the absolute path of the bundled engine and your project library. Copy its `cutvoke` entry into your MCP client (e.g., `claude_desktop_config.json` or `.cursor/mcp.json`). It looks like this:
 
 ```json
 {
   "mcpServers": {
     "cutvoke": {
-      "command": "python",
-      "args": ["-m", "cutvoke.mcp_supervisor"]
+      "command": "/path/to/CutVoke/resources/engine/cutvoke-engine",
+      "args": ["mcp", "--data", "/path/to/CutVoke Data/data/projects.sqlite"],
+      "env": { "CUTVOKE_HOME": "...", "CUTVOKE_FONT_CACHE": "...", "CUTVOKE_GPU_ACCELERATION": "1" }
     }
   }
 }
 ```
 
-*(Alternatively, after installing the Python package, you can invoke the `cutvoke-mcp` entry point directly.)*
+Use the values from your own file rather than this sketch. Per-client steps: [Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md). *(From a source checkout, `python -m cutvoke.mcp_supervisor` or the `cutvoke-mcp` entry point also works; see Option 3.)*
 
 2. Load the built-in [**`cutvoke-editor` Skill**](skills/cutvoke-editor/) into your coding or creative agent so it understands CutVoke's timeline schema, genre pacing guides, and effect catalogs. Full instructions are available in the [Agent Skill Guide](docs/user/agent-skill.md).
 

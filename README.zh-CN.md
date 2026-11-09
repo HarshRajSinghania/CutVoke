@@ -20,6 +20,22 @@
 
 </div>
 
+<p align="center">
+  <img src="examples/showcases/chase-the-light/previews/motorcycle-case_zh-CN.gif" alt="AI 生成的原始镜头与 CutVoke 剪辑成片对比" width="92%" />
+</p>
+
+> **CutVoke 是一款开源、本地运行的视频剪辑软件：你的 AI Agent 通过 MCP 直接剪时间线，你也能打开同一条时间线随时手动修改。**
+> Instagram 新推出的 Edits for Mac 也提供了 MCP，但只支持 macOS（Apple 芯片），而且要登录 Instagram 账号。CutVoke 支持 **Windows · macOS · Linux**，本地剪辑无需账号，源码采用 MIT 协议。
+> 适用于 Claude Code、Codex、Cursor、Claude Desktop 以及任何 MCP 客户端。
+
+**30 秒接入你的 Agent**
+
+1. [下载 CutVoke v0.3.5](https://github.com/frankShan001/CutVoke/releases/tag/v0.3.5) 并启动一次。
+2. 打开数据目录下的 `profile/mcp-config.json`（Windows：exe 旁的 `CutVoke Data`；macOS：`~/Library/Application Support/CutVoke/`；Linux：`~/.local/share/CutVoke/`）。里面已经写好了内置引擎的命令，不需要另装 Python。
+3. 把其中的 `cutvoke` 配置加到你的 Agent：[Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md)。然后直接说："剪掉停顿、加字幕、出一个 9:16 竖版，导出前先给我看几帧。"
+
+⭐ **觉得有用的话，点个 Star 能让更多创作者找到它。**
+
 ## v0.3.5 最新更新速览
 
 - **按文剪辑视频**：支持按句/词定位试听、预览删减影响，并支持一键同步撤销音画与字幕修改。
@@ -33,7 +49,7 @@
 <p>
   <a href="https://www.bilibili.com/video/BV18VHA62EZ1/"><img src="docs/images/readme/platform-links/bilibili.svg" alt="Bilibili" width="140" height="44" /></a>
   &nbsp;
-  <a href="https://www.youtube.com/watch?v=2--4_XO1SRI"><img src="docs/images/readme/platform-links/youtube.svg" alt="YouTube" width="148" height="44" /></a>
+  <a href="https://www.youtube.com/watch?v=2--4_XO15RI"><img src="docs/images/readme/platform-links/youtube.svg" alt="YouTube" width="148" height="44" /></a>
 </p>
 
 ## 为什么选择 CutVoke？
@@ -151,20 +167,21 @@ CutVoke 采用非破坏性、声明式的共享时间线架构，打通了桌面
 
 ### 方式二：接入 AI Agent（Claude Desktop / Cursor 等 MCP 客户端）
 
-1. 在你的 MCP 客户端配置文件（如 `claude_desktop_config.json` 或 `.cursor/mcp.json`）中添加 CutVoke 服务：
+1. 先启动一次桌面版。它会在数据目录写出 `profile/mcp-config.json`，其中包含内置引擎的绝对路径和你的工程库位置。把里面的 `cutvoke` 配置复制到 MCP 客户端（如 `claude_desktop_config.json` 或 `.cursor/mcp.json`），格式大致如下：
 
 ```json
 {
   "mcpServers": {
     "cutvoke": {
-      "command": "python",
-      "args": ["-m", "cutvoke.mcp_supervisor"]
+      "command": "/path/to/CutVoke/resources/engine/cutvoke-engine",
+      "args": ["mcp", "--data", "/path/to/CutVoke Data/data/projects.sqlite"],
+      "env": { "CUTVOKE_HOME": "...", "CUTVOKE_FONT_CACHE": "...", "CUTVOKE_GPU_ACCELERATION": "1" }
     }
   }
 }
 ```
 
-*（如果你已通过 pip/uv 安装了 Python 包，也可以直接将命令配置为 `cutvoke-mcp`。）*
+请以你自己文件里的值为准。各客户端的具体步骤：[Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md)。*（如果是源码运行，也可以使用 `python -m cutvoke.mcp_supervisor` 或 `cutvoke-mcp` 入口，见方式三。）*
 
 2. 将仓库内置的 [**`cutvoke-editor` 技能包**](skills/cutvoke-editor/) 挂载给你的 Agent，让它立即掌握时间线操作规范、分题材节奏指南与特效目录。详细配置步骤请查阅 [中文 Agent 技能接入指南](docs/user/agent-skill.zh-CN.md)。
 
