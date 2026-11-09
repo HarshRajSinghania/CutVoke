@@ -151,11 +151,19 @@ def referenced_sources(media_hashes, directories):
     return list(found.values())
 
 
+def validate_source_directory(directory):
+    """Keep writes inside their declared parent, including Windows junctions."""
+    directory = Path(directory)
+    expected = directory.parent.parent.resolve() / directory.parent.name / directory.name
+    if (directory.is_symlink() or directory.parent.is_symlink()
+            or directory.resolve() != expected):
+        raise ValueError("source handoff destination contains directory links")
+
+
 def retain_source_archive(info, directory):
     """Copy checked immutable ZIP, atomically and without replacing old bytes."""
     directory = Path(directory)
-    if directory.is_symlink() or directory.parent.is_symlink():
-        raise ValueError("generated source directory must not be a symbolic link")
+    validate_source_directory(directory)
     directory.mkdir(parents=True, exist_ok=True)
     target = directory / (info["bundleId"] + SUFFIX)
     _, raw = read_source_archive(info["path"], expected_sha=info["sha256"], expected_bundle=info["bundleId"])

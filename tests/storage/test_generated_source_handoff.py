@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import shutil
 import stat
+import subprocess
 import zipfile
 
 import pytest
@@ -241,7 +242,6 @@ def test_unreferenced_source_excluded_and_legacy_package_unchanged(handoff, tmp_
     assert referenced_sources({sha(other.read_bytes())}, {root / ".generated"}) == []
 
 
-@pytest.mark.skipif(os.name == "nt", reason="real directory symlinks require a Windows developer-mode/admin grant")
 def test_source_package_rejects_linked_media_directory_before_writing(handoff, tmp_path):
     project, _, _, _ = handoff
     package = tmp_path / "portable.cvkpkg"
@@ -251,7 +251,14 @@ def test_source_package_rejects_linked_media_directory_before_writing(handoff, t
     outside = tmp_path / "outside"
     outside.mkdir()
     (outside / "user.txt").write_bytes(b"keep")
-    (destination / "media").symlink_to(outside, target_is_directory=True)
+    if os.name == "nt":
+        # Junctions require no developer-mode/admin grant and are not reported
+        # by Path.is_symlink(). Test the actual Windows filesystem boundary.
+        subprocess.run(["cmd", "/c", "mklink", "/J", str(destination / "media"), str(outside)],
+                       capture_output=True, text=True, check=True)
+        assert not (destination / "media").is_symlink()
+    else:
+        (destination / "media").symlink_to(outside, target_is_directory=True)
     with pytest.raises(ProjectPackError, match="directory links"):
         unpack_project(str(package), str(destination), overwrite=True)
     assert sorted(p.name for p in outside.iterdir()) == ["user.txt"]

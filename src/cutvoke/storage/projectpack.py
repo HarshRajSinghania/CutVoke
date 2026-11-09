@@ -527,8 +527,12 @@ def unpack_project(pkg_path: str, dest_dir: str, *,
     with zipfile.ZipFile(pkg, "r") as archive, tempfile.TemporaryDirectory(prefix="cutvoke-source-check-") as temporary:
         staged = _stage_package_sources(archive, Path(temporary))
         dest = Path(dest_dir)
-        if staged and ((dest / "media").is_symlink() or (dest / "media" / ".generated").is_symlink()):
-            raise ProjectPackError("source handoff destination must not contain media directory links")
+        if staged:
+            from cutvoke.storage.generated_sources import validate_source_directory
+            try:
+                validate_source_directory(dest / "media" / ".generated")
+            except ValueError as error:
+                raise ProjectPackError(str(error)) from error
         # Existing immutable archives are checked before media can be overwritten.
         from cutvoke.storage.generated_sources import read_source_archive, retain_source_archive
         for item in staged:
