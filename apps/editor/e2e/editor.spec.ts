@@ -4765,7 +4765,7 @@ for (const prepared of [true, false]) {
     await page.locator('[data-clip-id="color-0"]').click();
     const meter = page.getByTestId("live-audio-meter"), volume = page.getByRole("slider", { name: "片段音量" });
     await expect(meter).toHaveAttribute("data-ready", "true");
-    const box = await volume.boundingBox(), baseline = (await readProject(request, id)).revision;
+    const baseline = (await readProject(request, id)).revision;
     const source = await video.getAttribute("src"), identity = await video.getAttribute("data-preview-identity");
     const lease = prepared ? source!.replace(/\/media$/, "/keepalive") : "";
     const leases = keepalives.filter(url => url.endsWith(lease)).length;
@@ -4777,9 +4777,21 @@ for (const prepared of [true, false]) {
       w.gainVoice.addEventListener("pause", () => w.gainPauses++);
       return { source: w.gainVoice.src, time: w.gainVoice.currentTime };
     });
+    // Playback/focus can scroll the inspector after its initial layout. Model
+    // that ordering explicitly and measure the actual hit target just before
+    // dragging, rather than using pre-playback coordinates.
+    await volume.scrollIntoViewIfNeeded();
+    const beforeScroll = await volume.boundingBox();
+    expect(beforeScroll).toBeTruthy();
+    await page.locator('.zone-right__scroll').evaluate(element => { element.scrollTop += 24; });
+    await expect.poll(async () => (await volume.boundingBox())?.y).not.toBe(beforeScroll!.y);
+    await volume.hover();
+    const box = await volume.boundingBox();
+    expect(box).toBeTruthy();
     await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
     await page.mouse.down();
     await page.mouse.move(box!.x + 1, box!.y + box!.height / 2, { steps: 3 });
+    await expect(volume).toHaveValue('0');
     await expect.poll(async () => Number(await meter.getAttribute("data-rms"))).toBeLessThan(.001);
     if (prepared) await page.waitForTimeout(600); // Held gain must not auto-save.
     else {
