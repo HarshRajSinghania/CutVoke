@@ -3,6 +3,7 @@ import copy
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 import stat
@@ -238,3 +239,20 @@ def test_unreferenced_source_excluded_and_legacy_package_unchanged(handoff, tmp_
     assert not warnings
     assert Path(restored.sequence.tracks[0].clips[0].asset_ref.source_path).read_bytes() == other.read_bytes()
     assert referenced_sources({sha(other.read_bytes())}, {root / ".generated"}) == []
+
+
+@pytest.mark.skipif(os.name == "nt", reason="real directory symlinks require a Windows developer-mode/admin grant")
+def test_source_package_rejects_linked_media_directory_before_writing(handoff, tmp_path):
+    project, _, _, _ = handoff
+    package = tmp_path / "portable.cvkpkg"
+    pack_project(project, str(package))
+    destination = tmp_path / "linked-destination"
+    destination.mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "user.txt").write_bytes(b"keep")
+    (destination / "media").symlink_to(outside, target_is_directory=True)
+    with pytest.raises(ProjectPackError, match="directory links"):
+        unpack_project(str(package), str(destination), overwrite=True)
+    assert sorted(p.name for p in outside.iterdir()) == ["user.txt"]
+    assert (outside / "user.txt").read_bytes() == b"keep"

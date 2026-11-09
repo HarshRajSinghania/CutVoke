@@ -154,7 +154,7 @@ def referenced_sources(media_hashes, directories):
 def retain_source_archive(info, directory):
     """Copy checked immutable ZIP, atomically and without replacing old bytes."""
     directory = Path(directory)
-    if directory.is_symlink():
+    if directory.is_symlink() or directory.parent.is_symlink():
         raise ValueError("generated source directory must not be a symbolic link")
     directory.mkdir(parents=True, exist_ok=True)
     target = directory / (info["bundleId"] + SUFFIX)
