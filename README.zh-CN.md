@@ -61,13 +61,13 @@
 
 ## 看看两个完整剪辑案例
 
-先看原始素材，再看完整剪辑。两个案例都提供 **中英文视频、原始素材和可编辑工程**；下方为原片高清静帧；下载对应 MP4，可观看带声音的完整视频。
+先看原始素材，再看完整剪辑。两个案例都提供 **中英文视频、原始素材和可编辑工程**；可直接播放下方带声音的视频，也可下载对应 MP4。
 
 ### 01 · 逐光而行
 
 **摩托短片 · 31.6 秒 · 横屏**
 
-<a href="https://raw.gitcode.com/shansjl/CutVoke/blobs/d7c695df7edf271d4964701c6dd297e1e2b1ec05/examples/showcases/chase-the-light/videos/motorcycle-case_zh-CN.mp4"><img src="examples/showcases/chase-the-light/previews/motorcycle-poster_zh-CN.jpg" alt="原片高清静帧；下载 MP4 可观看完整视频" width="720" /></a>
+https://github.com/user-attachments/assets/5647c4b6-2b2b-45db-bda4-e6ad83a4eca3
 
 [下载带声音的中文对比片](https://raw.gitcode.com/shansjl/CutVoke/blobs/d7c695df7edf271d4964701c6dd297e1e2b1ec05/examples/showcases/chase-the-light/videos/motorcycle-case_zh-CN.mp4) · [打开仓库视频页](examples/showcases/chase-the-light/videos/motorcycle-case_zh-CN.mp4)
 
@@ -79,7 +79,7 @@
 
 **手持旅拍 · 42.5 秒 · 9:16 竖屏**
 
-<a href="https://raw.gitcode.com/shansjl/CutVoke/blobs/1c1c7dd76d5260d6381b9d8156bb1f25bfff4f37/examples/showcases/travel-vlog/videos/travel-vlog-case_zh-CN.mp4"><img src="examples/showcases/travel-vlog/previews/travel-vlog-poster_zh-CN.jpg" alt="原片高清静帧；下载 MP4 可观看完整视频" width="360" /></a>
+https://github.com/user-attachments/assets/1210c3ae-eb37-47db-b1c7-1598f4e7b136
 
 [下载带声音的中文对比片](https://raw.gitcode.com/shansjl/CutVoke/blobs/1c1c7dd76d5260d6381b9d8156bb1f25bfff4f37/examples/showcases/travel-vlog/videos/travel-vlog-case_zh-CN.mp4) · [打开仓库视频页](examples/showcases/travel-vlog/videos/travel-vlog-case_zh-CN.mp4)
 

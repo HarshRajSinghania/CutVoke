@@ -61,13 +61,13 @@ Most AI video tools give you a "take-it-or-leave-it" exported MP4—if one cut f
 
 ## Two Complete Editing Showcases
 
-See the raw clips first, then the finished edit. Both showcases provide **bilingual videos, raw source footage, and editable `.cutvokepack` project packages**. Below are high-resolution poster frames; download the MP4 to watch the full video with audio.
+See the raw clips first, then the finished edit. Both showcases provide **bilingual videos, raw source footage, and editable `.cutvokepack` project packages**. Play the videos below with audio, or download the MP4s.
 
 ### 01 · Chase the Light
 
 **Motorcycle Short Film · 31.6s · Landscape**
 
-<a href="https://raw.gitcode.com/shansjl/CutVoke/blobs/be0897f4fed7fe6869d188c7e54bbfad1e19afcd/examples/showcases/chase-the-light/videos/motorcycle-case_en.mp4"><img src="examples/showcases/chase-the-light/previews/motorcycle-poster_en.jpg" alt="High-resolution frame; download the MP4 to watch the full video" width="720" /></a>
+https://github.com/user-attachments/assets/3504df36-059c-4ca5-ade9-dbde6a0e1663
 
 [Download Comparison Video with Audio (EN)](https://raw.gitcode.com/shansjl/CutVoke/blobs/be0897f4fed7fe6869d188c7e54bbfad1e19afcd/examples/showcases/chase-the-light/videos/motorcycle-case_en.mp4) · [Open Repo Video Page](examples/showcases/chase-the-light/videos/motorcycle-case_en.mp4)
 
@@ -79,7 +79,7 @@ See the raw clips first, then the finished edit. Both showcases provide **biling
 
 **Handheld Travel Vlog · 42.5s · 9:16 Vertical**
 
-<a href="https://raw.gitcode.com/shansjl/CutVoke/blobs/1bf878da94a891ec064638207a79fa8b96c27db3/examples/showcases/travel-vlog/videos/travel-vlog-case_en.mp4"><img src="examples/showcases/travel-vlog/previews/travel-vlog-poster_en.jpg" alt="High-resolution frame; download the MP4 to watch the full video" width="360" /></a>
+https://github.com/user-attachments/assets/5d87a1b1-b0cc-4a1b-ab76-ef31981e8326
 
 [Download Comparison Video with Audio (EN)](https://raw.gitcode.com/shansjl/CutVoke/blobs/1bf878da94a891ec064638207a79fa8b96c27db3/examples/showcases/travel-vlog/videos/travel-vlog-case_en.mp4) · [Open Repo Video Page](examples/showcases/travel-vlog/videos/travel-vlog-case_en.mp4)
 
