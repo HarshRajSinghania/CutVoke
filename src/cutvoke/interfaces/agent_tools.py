@@ -68,7 +68,10 @@ AGENT_TOOLS = [
            "includeSchemas": {"type": "boolean", "default": True}, **PAGE}),
     _tool("media_import", "每批最多 32 个文件。流式复制本机素材到持久素材库，探测尺寸/声音/时长；传 projectId 保存到该工程素材表，同一内容重复导入返回同一 assetId。不会创建时间线片段。",
           {**PROJECT, "paths": {"type": "array", "minItems": 1, "maxItems": 32, "items": STRING}}, ("paths",)),
-    _tool("generated_media", "Inspect/import an externally rendered code-video manifest (v1). Verify declared source/output hashes and video frame contract; import returns an ordinary assetId and separate inert source ZIP. Never executes source, downloads dependencies, or changes the timeline. Use clip.insert/asset.swap with revision and lease for edits. Source ZIP is NOT included in project_package; retain both artifacts. Alpha pixels and creative quality require separate review.",
+    _tool("generated_source", "List or inspect verified inert source ZIPs for media used by this project, or explicitly restore one into a NEW outPath directory. Never overwrites existing files, executes source, installs dependencies or edits the timeline. project_package includes referenced archives; unpacking retains ZIPs without extracting inputs. Cache index and undeclared dependencies are excluded.",
+          {**PROJECT, "operation": {"type": "string", "enum": ["list", "inspect", "restore"]},
+           "bundleId": STRING, "outPath": STRING}, ("projectId", "operation")),
+    _tool("generated_media", "Inspect/import an externally rendered code-video manifest (v1). Verify declared source/output hashes and video frame contract; import returns an ordinary assetId and inert source ZIP. Never executes source, downloads dependencies, or changes the timeline. Use clip.insert/asset.swap with revision and lease for edits. project_package includes archives for referenced media; generated_source inspects/restores them explicitly. Alpha pixels and creative quality require separate review.",
           {**PROJECT, "operation": {"type": "string", "enum": ["inspect", "import"]},
            "manifestPath": STRING}, ("projectId", "operation", "manifestPath")),
     _tool("media_list", "分页检索持久素材库；可按类型、名称、工程已用/未用过滤。返回可直接用于 clip.insert 的 assetId。",
@@ -329,6 +332,40 @@ class AgentTools:
     def generated_render(self, a):
         from cutvoke.interfaces.generated_render import GeneratedRender
         return GeneratedRender(self).call(a)
+
+    def generated_source(self, a):
+        from cutvoke.storage.generated_media import file_hash
+        from cutvoke.storage.generated_sources import referenced_sources, restore_source_archive, SHA
+        from cutvoke.storage.projectpack import _collect_asset_refs
+        project = self._project(a)
+        operation = a["operation"]
+        if operation == "list":
+            if a.get("bundleId") or a.get("outPath"):
+                raise ValueError("list accepts projectId and operation only")
+        elif not a.get("bundleId") or not SHA.fullmatch(a["bundleId"]):
+            raise ValueError("inspect/restore requires a lowercase SHA256 bundleId")
+        if operation == "restore" and not a.get("outPath"):
+            raise ValueError("restore requires a new outPath directory")
+        if operation == "inspect" and a.get("outPath"):
+            raise ValueError("inspect does not accept outPath")
+        paths = {Path(ref.source_path) for ref in _collect_asset_refs(project)}
+        if any(not path.is_file() for path in paths):
+            raise ValueError("relink missing project media before inspecting generated sources")
+        directories = {path.parent / ".generated" for path in paths}
+        directories.add(Path(self.api.media_dir) / ".generated")
+        archives = referenced_sources({file_hash(path) for path in paths}, directories)
+        result = {"projectId": project.project_id, "revision": project.revision,
+                  "timelineChanged": False, "runtimeExecuted": False}
+        if operation == "list":
+            return {**result, "archives": [{key: item[key] for key in
+                ("bundleId", "path", "sha256", "size", "outputSha256")} for item in archives]}
+        selected = next((item for item in archives if item["bundleId"] == a["bundleId"]), None)
+        if selected is None:
+            raise ValueError("source bundle not found for referenced project media")
+        if operation == "inspect":
+            return {**result, "sourceArchive": selected}
+        destination = self.service.output_path(project.project_id, a["outPath"], suffix="")
+        return {**result, "restored": restore_source_archive(selected, destination)}
 
     def _source(self, a):
         if bool(a.get("assetId")) == bool(a.get("path")):

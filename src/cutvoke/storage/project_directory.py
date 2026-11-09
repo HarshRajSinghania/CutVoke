@@ -214,6 +214,17 @@ class DirectoryProjectStore(ProjectStore):
                     return copied[value]
                 return value
             updated = _map_paths(data, own)
+            # Package imports/clones collect the ZIP companions of referenced
+            # media too. The ZIP stays inert; no source extraction or execution.
+            external = {old: new for old, new in copied.items()
+                        if Path(old).expanduser().resolve().parent != Path(new).parent}
+            if external:
+                from cutvoke.storage.generated_sources import referenced_sources, retain_source_archive
+                directories = {Path(old).expanduser().resolve().parent / ".generated" for old in external}
+                directories = {path for path in directories if path.exists()}
+                hashes = {_digest(Path(new)) for new in external.values()} if directories else set()
+                for archive in referenced_sources(hashes, directories):
+                    retain_source_archive(archive, self.root / "media" / ".generated")
             original_names = {owned: Path(original).name for original, owned in copied.items()}
             seen = set()
             for ref in _refs(updated):

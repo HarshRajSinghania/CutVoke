@@ -48,13 +48,14 @@ For parameter changes or local frame windows, also read
 save the effective request/key, use an independently trusted external renderer
 on a miss, and use returned `mediaSourceStart` on a covering cache hit. Source
 execution is disabled. Keep native titles/audio editable; preview an atomic
-split/trim/swap batch for a local repair. Source archives and the cache index
-remain outside `.cvkpkg`. See [request/cache details](../../docs/user/generated-render.md).
+split/trim/swap batch for a local repair. Referenced source archives travel inside `.cvkpkg`; the cache index
+remains outside it. Use `generated_source` to inspect or explicitly restore
+inputs into a new directory without executing them. See [request/cache details](../../docs/user/generated-render.md).
 `generated_media` statically inspects/imports a hashed source/output manifest;
 it never executes code or edits the timeline. Use the returned ordinary asset
 with `clip.insert` or explicit `asset.swap` targets. Preserve native text/audio
-where useful and deliver its separate source ZIP alongside the editable package;
-`project_package` does not include that source ZIP. See the
+where useful. `project_package` includes verified source ZIPs for media referenced
+by the edit; unused imports and undeclared dependencies are excluded. See the
 [bridge example](../../examples/generated-media/README.md).
 
 Acquire `edit_lock` before grouped Agent edits. Use `command_preview` where supported, then the same payload with `command_apply`, current `expectedRevision`, stable `commandId` and `editLeaseId`. Use supported `edit.batch` operations within its current limit. Keep returned revisions, renew leases as needed and release in a finally step, including before long export or human takeover. After errors follow `error.recovery`; retry a lost response with identical arguments and ID, reconcile conflicts before a new edit.
