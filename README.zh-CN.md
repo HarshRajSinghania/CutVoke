@@ -31,7 +31,7 @@
 **30 秒接入你的 Agent**
 
 1. [下载 CutVoke v0.3.5](https://github.com/frankShan001/CutVoke/releases/tag/v0.3.5) 并启动一次。
-2. 打开数据目录下的 `profile/mcp-config.json`（Windows：exe 旁的 `CutVoke Data`；macOS：`~/Library/Application Support/CutVoke/`；Linux：`~/.local/share/CutVoke/`）。里面已经写好了内置引擎的命令，不需要另装 Python。
+2. 打开数据目录下的 `profile/mcp-config.json`（Windows 便携版：exe 旁的 `CutVoke Data`；macOS：`~/Library/Application Support/CutVoke/`；Linux：`${XDG_DATA_HOME:-~/.local/share}/CutVoke/`）。里面已经写好了内置引擎的命令，不需要另装 Python。
 3. 把其中的 `cutvoke` 配置加到你的 Agent：[Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md)。然后直接说："剪掉停顿、加字幕、出一个 9:16 竖版，导出前先给我看几帧。"
 
 ⭐ **觉得有用的话，点个 Star 能让更多创作者找到它。**
@@ -147,7 +147,7 @@ CutVoke 采用非破坏性、声明式的共享时间线架构，打通了桌面
 ### 2. 四种使用模式，按需自由组合
 - **可视化桌面剪辑**：直接打开桌面应用拖拽素材、精修时间线，零代码门槛。
 - **MCP / AI Agent 实时协作**：AI 可直接提交创作方案、读取时间线状态、审阅渲染帧证据并执行局部修补（参见 [Agent 技能说明](docs/user/agent-skill.zh-CN.md)）。
-- **内置五大题材剪辑规范（`skills/cutvoke-editor/`）**：预置面向 **MV/音乐视觉**（[`music-video.md`](skills/cutvoke-editor/music-video.md)）、**纪录片/Vlog**（[`documentary.md`](skills/cutvoke-editor/documentary.md)）、**剧情叙事**（[`narrative.md`](skills/cutvoke-editor/narrative.md)）、**知识解说/教程**（[`explainer.md`](skills/cutvoke-editor/explainer.md)）与 **产品宣传片**（[`showcase.md`](skills/cutvoke-editor/showcase.md)）的专业 Agent 剪辑指南。
+- **内置五大题材剪辑规范（`skills/cutvoke-editor/`）**：预置面向 **MV/音乐视觉**（[`music-video.md`](skills/cutvoke-editor/references/workflows/music-video.md)）、**纪录片/Vlog**（[`documentary.md`](skills/cutvoke-editor/references/workflows/documentary.md)）、**剧情叙事**（[`narrative.md`](skills/cutvoke-editor/references/workflows/narrative.md)）、**知识解说/教程**（[`explainer.md`](skills/cutvoke-editor/references/workflows/explainer.md)）与 **产品宣传片**（[`showcase.md`](skills/cutvoke-editor/references/workflows/showcase.md)）的专业 Agent 剪辑指南。
 - **CLI、HTTP API 与代码视频自动化**：支持脚本化批量渲染视频、导入经过校验的外部代码生成视频素材，或集成进你自己的自动化媒体工作流。
 
 ## 快速开始
@@ -181,7 +181,7 @@ CutVoke 采用非破坏性、声明式的共享时间线架构，打通了桌面
 }
 ```
 
-请以你自己文件里的值为准。各客户端的具体步骤：[Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md)。*（如果是源码运行，也可以使用 `python -m cutvoke.mcp_supervisor` 或 `cutvoke-mcp` 入口，见方式三。）*
+请以你自己文件里的值为准。各客户端的具体步骤：[Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md)。*（如果是源码运行，也可以使用 `python -m cutvoke mcp --data <path>` 或 `cutvoke-mcp --data <path>`，见方式三。）*
 
 2. 将仓库内置的 [**`cutvoke-editor` 技能包**](skills/cutvoke-editor/) 挂载给你的 Agent，让它立即掌握时间线操作规范、分题材节奏指南与特效目录。详细配置步骤请查阅 [中文 Agent 技能接入指南](docs/user/agent-skill.zh-CN.md)。
 

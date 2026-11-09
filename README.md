@@ -31,7 +31,7 @@
 **Connect your agent in 30 seconds**
 
 1. [Download CutVoke v0.3.5](https://github.com/frankShan001/CutVoke/releases/tag/v0.3.5) and launch it once.
-2. Open `profile/mcp-config.json` in the CutVoke data folder (Windows: `CutVoke Data` next to the exe · macOS: `~/Library/Application Support/CutVoke/` · Linux: `~/.local/share/CutVoke/`). It already contains the bundled engine command, so no Python install is needed.
+2. Open `profile/mcp-config.json` in the CutVoke data folder (Windows portable: `CutVoke Data` next to the exe · macOS: `~/Library/Application Support/CutVoke/` · Linux: `${XDG_DATA_HOME:-~/.local/share}/CutVoke/`). It already contains the bundled engine command, so no Python install is needed.
 3. Add the `cutvoke` entry to your agent: [Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md). Then ask: *"Cut the silences, add captions, make a 9:16 version, and show me a few frames before you export."*
 
 ⭐ **If CutVoke is useful to you, a star helps other creators find it.**
@@ -147,7 +147,7 @@ Once CutVoke is connected to Claude Desktop, Cursor, or any MCP client, you can 
 ### 2. Four Flexible Ways to Use CutVoke
 - **Visual Desktop / Web Editor**: Open the app and edit directly with mouse and keyboard shortcuts—no coding required.
 - **AI Agent Collaboration (MCP)**: Let AI agents propose creative edits, inspect rendered frame evidence, and patch specific timeline ranges via MCP ([Local Delivery MCP](docs/user/LOCAL_DELIVERY_MCP.md)).
-- **Pre-Built Agent Skills (`skills/cutvoke-editor/`)**: Includes specialized editing guides for **Music Videos** ([`music-video.md`](skills/cutvoke-editor/music-video.md)), **Documentaries & Vlogs** ([`documentary.md`](skills/cutvoke-editor/documentary.md)), **Narrative Films** ([`narrative.md`](skills/cutvoke-editor/narrative.md)), **Explainers & Tutorials** ([`explainer.md`](skills/cutvoke-editor/explainer.md)), and **Product Showcases** ([`showcase.md`](skills/cutvoke-editor/showcase.md)).
+- **Pre-Built Agent Skills (`skills/cutvoke-editor/`)**: Includes specialized editing guides for **Music Videos** ([`music-video.md`](skills/cutvoke-editor/references/workflows/music-video.md)), **Documentaries & Vlogs** ([`documentary.md`](skills/cutvoke-editor/references/workflows/documentary.md)), **Narrative Films** ([`narrative.md`](skills/cutvoke-editor/references/workflows/narrative.md)), **Explainers & Tutorials** ([`explainer.md`](skills/cutvoke-editor/references/workflows/explainer.md)), and **Product Showcases** ([`showcase.md`](skills/cutvoke-editor/references/workflows/showcase.md)).
 - **CLI, HTTP API & Code-Video Automation**: Batch-render videos, import verified code-generated animations, or integrate CutVoke into custom media pipelines.
 
 ## Get Started
@@ -181,7 +181,7 @@ No Python or Node.js setup required. Download the latest pre-built package for y
 }
 ```
 
-Use the values from your own file rather than this sketch. Per-client steps: [Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md). *(From a source checkout, `python -m cutvoke.mcp_supervisor` or the `cutvoke-mcp` entry point also works; see Option 3.)*
+Use the values from your own file rather than this sketch. Per-client steps: [Claude Code](docs/integrations/claude-code.md) · [Codex](docs/integrations/codex.md) · [Cursor](docs/integrations/cursor.md). *(From a source checkout, `python -m cutvoke mcp --data <path>` or `cutvoke-mcp --data <path>` also works; see Option 3.)*
 
 2. Load the built-in [**`cutvoke-editor` Skill**](skills/cutvoke-editor/) into your coding or creative agent so it understands CutVoke's timeline schema, genre pacing guides, and effect catalogs. Full instructions are available in the [Agent Skill Guide](docs/user/agent-skill.md).
 

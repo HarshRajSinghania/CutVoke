@@ -35,9 +35,9 @@ The file has this shape (values are absolute paths on your machine):
 }
 ```
 
-Always copy the values from your own file. If you move the app, launch it once more to refresh the paths. No system Python is needed for the packaged engine.
+Always copy the values from your own file. On Windows the bundled command is `cutvoke-engine.exe`. `CUTVOKE_GPU_ACCELERATION` is `"1"` unless GPU acceleration is turned off in the app, which writes `"0"`. If you move the app, launch it once more to refresh the paths. No system Python is needed for the packaged engine.
 
-Running from a source checkout instead? Use `cutvoke mcp --data <path>` (or the `cutvoke-mcp` entry point) from the activated environment, and point `--data` at the same library the editor uses. See [external-agent-editing.md](../user/external-agent-editing.md).
+Running the desktop app from a source checkout, without the bundled engine, writes the same file with a different command: the checkout's `.venv` Python, args `["-m", "cutvoke", "mcp", "--data", "<projects.sqlite>"]`, and `PYTHONPATH` set to the repository `src` directory. An activated environment can also use `cutvoke mcp --data <path>` or `cutvoke-mcp --data <path>`, pointed at the same library the editor uses. See [external-agent-editing.md](../user/external-agent-editing.md).
 
 ## Optional: the cutvoke-editor skill
 
