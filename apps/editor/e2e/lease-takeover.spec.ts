@@ -35,8 +35,15 @@ test('human takeover cancels safely, submits once, rejects stale writes and igno
     expect((await (await request.get(`/api/v1/projects/${id}/edit-lock`)).json()).lease.leaseId).toBe(lease.leaseId);
     const slow = gate(), seen = gate(), delivered = gate();
     let hold = true;
-    await page.route(`**/projects/${id}/edit-lock`, async (route) => { if (!hold)
-        return route.continue(); const response = await route.fetch(); seen.release(); await slow.promise; await route.fulfill({ response }); delivered.release(); });
+    await page.route(`**/projects/${id}/edit-lock`, async (route) => {
+        if (!hold)
+            return route.continue();
+        const response = await route.fetch();
+        seen.release();
+        await slow.promise;
+        await route.fulfill({ response });
+        delivered.release();
+    });
     await seen.promise;
     await confirm(page);
     await accepted.promise;
@@ -89,8 +96,13 @@ test('a successful revoke stays read-only until the refreshed project arrives', 
     await open(page, id);
     const refresh = gate(), seen = gate();
     let hold = true;
-    await page.route(`**/projects/${id}/sync**`, async (route) => { if (route.request().method() !== 'GET' || !hold)
-        return route.continue(); seen.release(); await refresh.promise; return route.continue(); });
+    await page.route(`**/projects/${id}/sync**`, async (route) => {
+        if (route.request().method() !== 'GET' || !hold)
+            return route.continue();
+        seen.release();
+        await refresh.promise;
+        return route.continue();
+    });
     await confirm(page);
     await seen.promise;
     expect((await (await request.get(`/api/v1/projects/${id}/edit-lock`)).json()).locked).toBe(false);
@@ -106,8 +118,14 @@ test('a stale confirmation cannot break a replacement lease', async ({ page, req
     await page.getByRole('button', { name: '接管编辑', exact: true }).click();
     const seen = gate(), slow = gate();
     let hold = true;
-    await page.route(`**/projects/${id}/edit-lock`, async (route) => { if (!hold)
-        return route.continue(); const response = await route.fetch(); seen.release(); await slow.promise; await route.fulfill({ response }); });
+    await page.route(`**/projects/${id}/edit-lock`, async (route) => {
+        if (!hold)
+            return route.continue();
+        const response = await route.fetch();
+        seen.release();
+        await slow.promise;
+        await route.fulfill({ response });
+    });
     await seen.promise;
     await request.post(`/api/v1/projects/${id}/edit-lock/release`, { data: { leaseId: old.leaseId } });
     const replacement = await lock(request, id, 'replacement-agent');
@@ -128,8 +146,14 @@ for (const reopen of [false, true])
         const seen = gate(), slow = gate(), delivered = gate();
         let hold = true;
         const obsolete = { projectId: a, leaseId: 'obsolete-ui-token', owner: 'obsolete-agent', acquiredAt: Date.now() / 1000, expiresAt: Date.now() / 1000 + 300 };
-        await page.route(`**/projects/${a}/edit-lock`, async (route) => { if (!hold)
-            return route.continue(); seen.release(); await slow.promise; await route.fulfill({ json: { locked: true, lease: obsolete } }); delivered.release(); });
+        await page.route(`**/projects/${a}/edit-lock`, async (route) => {
+            if (!hold)
+                return route.continue();
+            seen.release();
+            await slow.promise;
+            await route.fulfill({ json: { locked: true, lease: obsolete } });
+            delivered.release();
+        });
         await seen.promise;
         await page.getByRole('button', { name: '返回工程列表', exact: true }).click();
         await page.getByRole('button', { name: `打开工程 ${reopen ? a : b}`, exact: true }).click();
@@ -188,4 +212,28 @@ test('a slow lease poll is coalesced instead of being starved by newer requests'
     slow.release();
     await delivered.promise;
     await expect(page.locator('.agent-edit-lock')).toContainText('slow-agent');
+});
+test('an unresponsive lease poll times out conservatively and learns the replacement', async ({ page, request }) => {
+    const id = await seed(request, 'poll-timeout'), old = await lock(request, id, 'original-agent');
+    await page.clock.install();
+    await open(page, id);
+    await expect(page.locator('.agent-edit-lock')).toContainText('original-agent');
+    const seen = gate(), release = gate();
+    let calls = 0;
+    await page.route(`**/projects/${id}/edit-lock`, async (route) => {
+        if (++calls > 1)
+            return route.continue();
+        seen.release();
+        await release.promise;
+        await route.abort().catch(() => { });
+    });
+    await page.clock.runFor(1000);
+    await seen.promise;
+    await request.post(`/api/v1/projects/${id}/edit-lock/release`, { data: { leaseId: old.leaseId } });
+    await lock(request, id, 'replacement-agent');
+    await expect(page.locator('.agent-edit-lock')).toContainText('original-agent');
+    await page.clock.runFor(11000);
+    await expect(page.locator('.agent-edit-lock')).toContainText('replacement-agent');
+    expect(calls).toBeGreaterThan(1);
+    release.release();
 });

@@ -241,3 +241,51 @@ def test_a_lease_acquired_during_a_human_command_fences_the_final_write(peers):
     assert error.value.code == "EDIT_LOCKED"
     assert human.get_project("p").revision == "0"
     assert store.get_idempotent("p", "human") is None and not store.events_since("p")
+
+
+def test_workspace_maintenance_cannot_bypass_a_late_token_revocation(peers, tmp_path):
+    import hashlib
+    (agent, human), (store, _) = peers
+    source, target = tmp_path / "before.png", tmp_path / "after.png"
+    source.write_bytes(b"same-media"); target.write_bytes(source.read_bytes())
+    human.execute(Command(type="clip.insert", payload={
+        "trackId": "video", "createTrackKind": "video", "clipId": "source-clip",
+        "sourcePath": str(source), "timelineStart": {"num": 0, "den": 1},
+        "timelineEnd": {"num": 1, "den": 1}}, command_id="seed", project_id="p",
+        expected_revision="0", actor=Actor("human", "test")))
+    token = agent.acquire_edit_lease("p")["leaseId"]
+    original = store.relocate_paths
+    def revoke_then_relocate(*args, **kwargs):
+        assert human.takeover_edit_lease("p", token, actor=Actor("human", "web-editor"))["takenOver"]
+        return original(*args, **kwargs)
+    with patch.object(store, "relocate_paths", side_effect=revoke_then_relocate):
+        with pytest.raises(EditError) as error:
+            agent.execute(Command(type="workspace.relocatePaths", payload={
+                "moves": [{"from": str(source), "to": str(target),
+                           "sha256": hashlib.sha256(source.read_bytes()).hexdigest()}],
+                "expectedProjects": {"p": "1"}}, command_id="relocate", project_id="p",
+                expected_revision="1", actor=Actor("agent", "test"), edit_lease_id=token))
+    assert error.value.code == "EDIT_LEASE_INVALID"
+    project = human.get_project("p")
+    assert project.revision == "1"
+    assert project.sequence.tracks[0].clips[0].asset_ref.source_path == str(source)
+    assert store.get_idempotent("__workspace__", "relocate") is None
+
+
+def test_committed_workspace_receipt_stays_replayable_after_takeover(peers, tmp_path):
+    import hashlib
+    (agent, human), (store, _) = peers
+    source, target = tmp_path / "from.png", tmp_path / "to.png"
+    source.write_bytes(b"same-media"); target.write_bytes(source.read_bytes())
+    command = Command(type="workspace.relocatePaths", payload={
+        "moves": [{"from": str(source), "to": str(target),
+                   "sha256": hashlib.sha256(source.read_bytes()).hexdigest()}],
+        "expectedProjects": {"p": "0"}}, command_id="maintenance", project_id="p",
+        expected_revision="0", actor=Actor("human", "test"))
+    receipt = human.execute(command)
+    token = agent.acquire_edit_lease("p")["leaseId"]
+    human.takeover_edit_lease("p", token, actor=Actor("human", "web-editor"))
+    command.edit_lease_id = token
+    before = store.get_idempotent("__workspace__", "maintenance")
+    assert agent.execute(command).to_dict() == receipt.to_dict()
+    assert store.get_idempotent("__workspace__", "maintenance") == before

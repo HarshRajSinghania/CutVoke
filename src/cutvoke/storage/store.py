@@ -130,9 +130,15 @@ class ProjectStore:
             backup.close()
 
     @_synchronized
-    def relocate_paths(self, **kwargs) -> dict:
+    def relocate_paths(self, *, project_id: Optional[str] = None,
+                       edit_lease_id: str = "", **kwargs) -> dict:
         from cutvoke.storage.workspace_paths import relocate_connection
         with self._transaction():
+            replay = self._conn.execute(
+                "SELECT 1 FROM idempotency WHERE project_id='__workspace__' AND command_id=?",
+                (kwargs.get("command_id"),)).fetchone()
+            if edit_lease_id and replay is None:
+                self._assert_edit_lease(project_id, edit_lease_id)
             return relocate_connection(self._conn, **kwargs)
 
     # ------------------------------------------------------------------

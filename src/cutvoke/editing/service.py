@@ -1410,9 +1410,12 @@ class EditService:
             raise EditError(ErrorCode.INVALID_ARGUMENT, "workspace relocation requires a persistent store and command context")
         try:
             result = self._store.relocate_paths(
+                project_id=command.project_id, edit_lease_id=command.edit_lease_id,
                 moves=payload.get("moves"), expected_projects=payload.get("expectedProjects"),
                 command_id=command.command_id, request_hash=self._request_hash(command),
                 actor={"kind": command.actor.kind, "id": command.actor.id} if command.actor else None)
+        except EditLeaseConflict as exc:
+            raise self._lease_failure(exc) from exc
         except RevisionConflict as exc:
             raise EditError(ErrorCode.REVISION_CONFLICT, str(exc), retryable=True) from exc
         except (ValueError, KeyError, OSError) as exc:
