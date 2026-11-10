@@ -90,7 +90,7 @@ AGENT_TOOLS = [
     _tool("preview_job", "查询/取消预览任务；完成返回本机可播放文件路径。标准 MCP 自动更新保留任务；整个服务关闭后可重新提交并复用磁盘缓存。",
           {**PROJECT, "jobId": STRING, "action": {"type": "string", "enum": ["status", "cancel"], "default": "status"}},
           ("projectId", "jobId")),
-    _tool("export_job", "非阻塞查询/取消导出任务。用 command_apply export.enqueue 创建任务，传 expectedRevision、outPath、quality、range；轮询本工具直到 succeeded，再读取 result.output_path。",
+    _tool("export_job", "非阻塞查询/取消导出任务。用 command_apply export.enqueue 创建任务，传 expectedRevision、outPath、quality、range；queued/running 时按返回的 pollAfterSeconds（秒）等待再查询；终态为 null，停止轮询，succeeded 时读取 result.output_path。使用有界超时。",
           {**PROJECT, "jobId": STRING, "action": {"type": "string", "enum": ["status", "cancel"], "default": "status"}},
           ("projectId", "jobId")),
     _tool("project_events", "分页读取实际操作者、修改对象与版本事件，用于核对 Agent 修改、人工接手和撤销历史。nextAfterSeq 可用于下次增量读取。",
@@ -466,14 +466,20 @@ class AgentTools:
         # Reading another interface's live ledger must not initialize a queue
         # (which also performs restart recovery of its own interrupted work).
         store = self.service.store
-        job = store.get_export_job(a["jobId"]) if store else self.api._export_queue().get(a["jobId"])
+        if store is not None:
+            job = store.get_export_job(a["jobId"])
+        else:
+            queue = self.service._export_queue
+            job = queue.get(a["jobId"]) if queue is not None else None
         if job is None or job["projectId"] != a["projectId"]:
             raise EditError("NOT_FOUND", "export job not found for this project")
         if a.get("action") == "cancel":
             queue = self.api._export_queue()
             queue.cancel(a["jobId"])
             job = queue.get(a["jobId"])
-        return job
+        # A response-only hint: never persist it or mutate the queue/ledger job.
+        # null means stop polling, not an immediate retry.
+        return dict(job, pollAfterSeconds=1 if job["status"] in ("queued", "running") else None)
 
     def project_events(self, a):
         project = self._project(a)
