@@ -66,7 +66,7 @@ export async function selectProject(
 export async function refreshProject(
   dispatch: Dispatch<EditorAction>,
   projectId: string,
-  options: { quiet?: boolean; signal?: AbortSignal; isCurrent?: () => boolean } = {},
+  options: { quiet?: boolean; signal?: AbortSignal; isCurrent?: () => boolean; reportError?: boolean } = {},
 ): Promise<boolean> {
   const startedRevision = latestState?.currentId === projectId ? latestState.revision : undefined;
   // A response may outlive its preview worker, including leaving and reopening
@@ -84,7 +84,7 @@ export async function refreshProject(
     if (!current()) return false;
     if (options.quiet && startedRevision !== undefined && latestState?.revision !== startedRevision) return false;
     dispatch({ type: "SYNC_STATE_SET", syncState: "error" });
-    showError(dispatch, err);
+    if (options.reportError !== false) showError(dispatch, err);
     return false;
   }
 }
@@ -109,7 +109,7 @@ export async function pollEditLock(dispatch: Dispatch<EditorAction>, state: Edit
     if (!current()) return;
     // Handoff includes a fresh project snapshot before exposing human controls.
     if (!status.locked && latestState?.editLock &&
-        !await refreshProject(dispatch, projectId, { quiet: true, isCurrent: current })) return;
+        !await refreshProject(dispatch, projectId, { quiet: true, isCurrent: current, reportError: false })) return;
     if (current()) dispatch({ type: "EDIT_LOCK_SET", projectId, lease: status.locked ? status.lease : null });
   } catch {
     // Keep the last known lease on transport failure.

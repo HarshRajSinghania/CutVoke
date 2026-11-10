@@ -167,8 +167,16 @@ for (const reopen of [false, true])
 test('a refresh failure after revoke keeps human controls locked until recovery', async ({ page, request }) => {
     const id = await seed(request, 'refresh-failure');
     await lock(request, id);
+    await page.clock.install();
     await open(page, id);
     let fail = true;
+    let takeovers = 0;
+    // Keep *all* background refreshes failing until the manual retry is sent.
+    // Otherwise a successful poll can legitimately remove the retry button.
+    await page.route(`**/projects/${id}/edit-lock/takeover`, route => {
+        if (++takeovers === 2) fail = false;
+        return route.continue();
+    });
     await page.route(`**/projects/${id}/sync**`, route => fail ? route.fulfill({ status: 503, json: { error: { code: 'UNAVAILABLE', message: 'refresh unavailable' } } }) : route.continue());
     await confirm(page);
     const error = page.getByRole('alertdialog', { name: '操作未完成' });
@@ -176,8 +184,12 @@ test('a refresh failure after revoke keeps human controls locked until recovery'
     await error.getByRole('button', { name: '关闭', exact: true }).click();
     expect((await (await request.get(`/api/v1/projects/${id}/edit-lock`)).json()).locked).toBe(false);
     await expect(page.locator('.agent-edit-lock')).toContainText('接管未完成');
-    fail = false;
+    const backgroundFailure = page.waitForResponse(response => response.url().includes(`/projects/${id}/sync`) && response.status() === 503);
+    await page.clock.runFor(2000);
+    await backgroundFailure;
+    await expect(error).toHaveCount(0);
     await page.getByRole('button', { name: '确认接管', exact: true }).click();
+    expect(takeovers).toBe(2);
     await expect(page.locator('.agent-edit-lock')).toHaveCount(0);
     const events = (await (await request.get(`/api/v1/projects/${id}/events?since=0`)).json()).events;
     expect(events.filter((e: {
