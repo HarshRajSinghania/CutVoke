@@ -81,3 +81,26 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 
 
 创作型任务可先用 `creative_workflow({"operation":"list","query":"旅行","locale":"zh-CN"})` 找配方，再取单张详情和 plan/review/repair schema。审片记录须附当前 projectId/revision/sequenceId、实际成片或抽帧证据；局部修复使用 `preview-repair`，显式提交后重新生成证据。详见[可执行创作闭环](../../skills/cutvoke-editor/references/creative-workflow.md)。此入口不自动判断艺术质量，不打开证据文件，也不替代事实与原意核对。
+
+## 人工提前接管租约
+
+编辑器显示 Agent 的租约持有者和剩余秒数。点击「接管编辑」，核对后确认，
+即可结束当前观察到的指定租约；取消不会发送接管请求。接管保留已提交的修改，
+刷新工程成功后才恢复人工编辑。失败时保持只读并允许重试；如果租约已被替换，
+界面显示新持有者，必须重新确认，不能撤销替换后的租约。
+
+本地编辑器调用 `POST /api/v1/projects/{projectId}/edit-lock/takeover`，
+请求体为 `{"leaseId":"当前观察到的租约 ID"}`。响应包含 `status`、`takenOver`、
+`locked` 和 `lease`。重复接管已经结束的租约不会重复写入审计记录。
+审计使用 `edit.lease.takenOver` 事件，记录本地编辑器 `human/web-editor`、
+原持有者、租约 ID、时间和接管时的 revision；它不是剪辑，不推进 revision、
+不增加撤销历史，也不能在活动抽屉中「撤销到此」。按 revision 读取事件时，
+接管事件可在相同 revision 再次返回，客户端应按 `eventId` 去重。
+
+Agent 必须在每次写入中携带取得的 `editLeaseId`。失效、过期或被替换的 token
+会得到不可自动重试的 `EDIT_LEASE_INVALID`：重新读取工程并等待新的人工交接，再取得新租约后
+重新规划操作；不要原样重发旧 token。续租以及使用旧 ID 再次 acquire 同样失败。
+已经成功提交的相同 `commandId`/请求仍可重放原回执，不产生新写入。
+校验同时覆盖入口和 SQLite 最终写入事务，包括字幕导入和重命名。
+既有不携带 token 的人工操作继续兼容；actor 是现有本地接口的来源标记，
+此功能不增加用户认证，也不提供轨道级并行租约或租约变更回顾。

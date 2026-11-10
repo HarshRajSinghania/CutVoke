@@ -128,6 +128,8 @@ CutVoke uses a non-destructive, declarative timeline model shared across the vis
         └─────────────────────────────────────────────────┘
 ```
 
+While an agent holds an editing lease, the editor shows its owner and remaining time. Use **Take over editing** to end that specific lease and refresh the project before continuing. Completed edits are preserved; requests using the old lease are rejected.
+
 ### Example Prompts You Can Give Your AI Agent
 
 Once CutVoke is connected to Claude Desktop, Cursor, or any MCP client, you can hand off tedious tasks while keeping full creative control in the UI:

@@ -234,6 +234,15 @@ export async function getEditLock(projectId: string): Promise<EditLockStatus> {
   return get<EditLockStatus>(`/projects/${encodeURIComponent(projectId)}/edit-lock`);
 }
 
+export interface EditLockTakeoverStatus extends EditLockStatus {
+  status: "taken-over" | "lease-changed" | "not-held" | "expired";
+  takenOver: boolean;
+}
+
+export async function takeOverEditLock(projectId: string, leaseId: string): Promise<EditLockTakeoverStatus> {
+  return post<EditLockTakeoverStatus>(`/projects/${encodeURIComponent(projectId)}/edit-lock/takeover`, { leaseId });
+}
+
 /** GET /projects/{id}/summary */
 export async function getProjectSummary(projectId: string): Promise<ProjectSummary> {
   return get<ProjectSummary>(`/projects/${encodeURIComponent(projectId)}/summary`);

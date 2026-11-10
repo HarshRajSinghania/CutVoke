@@ -326,6 +326,7 @@ def recovery(code, arguments):
         "IDEMPOTENCY_MISMATCH": "This commandId was already used for different arguments. Retry the original arguments or assign a new ID to the new edit.",
         "INVALID_ARGUMENT": "Read the indicated field and exact schema, correct it, then preview again. Do not repeat identical invalid arguments.",
         "EDIT_LOCKED": "Read project_summary lease state. Wait or ask for human takeover; do not steal another editor's lease.",
+        "EDIT_LEASE_INVALID": "Read the latest project and discard the stale edit plan. Wait for a new human handoff before acquiring a fresh lease. Do not retry or renew the old token, and never automatically reclaim editing after human takeover.",
         "ASSET_MISSING": "Inspect the reported path; locate/import the intended source and use asset.swap to relink affected clips.",
         "ASSET_CHANGED": "Inspect the intended source again, confirm its identity/duration, and relink before retrying.",
         "EFFECT_UNAVAILABLE": "Discover a supported effect using resources_list/effects_list and request its exact schema.",
