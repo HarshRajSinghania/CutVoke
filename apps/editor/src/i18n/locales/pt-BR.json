@@ -746,7 +746,6 @@
   "工程互换": "Intercâmbio de projetos",
   "工程保存位置": "Local dos projetos",
   "工程信息": "Informações do projeto",
-  "工程内容会继续更新，Agent 完成后页面将自动恢复编辑。": "O projeto continuará atualizado. a edição reitera automaticamente quando o agente terminar.",
   "工程加载进度": "Progresso do Projeto Loading",
   "工程同步响应不完整，请刷新后重试。": "A resposta de sincronização está incompleta. Atualize e tente novamente.",
   "工程名称": "Nome do projeto",
@@ -2203,5 +2202,15 @@
   "，素材已齐备": "Todos os meios de comunicação fornecidos",
   "，跟随视频移动": "Seguindo o vídeo",
   "，预计剩余 {0}（当前阶段）": ", tempo restante estimado: {0} (etapa atual)",
-  "； 不修改文字、时码、位置或动画。": "O texto, o tempo, a posição e a animação permanecem inalterados."
+  "； 不修改文字、时码、位置或动画。": "O texto, o tempo, a posição e a animação permanecem inalterados.",
+  "人工接管编辑租约": "Uma pessoa assumiu a permissão de edição",
+  "将结束此 Agent 的租约并刷新工程。已完成的修改会保留，旧请求将被拒绝。": "A permissão deste agente será encerrada e o projeto será atualizado. Edições concluídas serão mantidas; solicitações antigas serão rejeitadas.",
+  "已接管编辑，工程已刷新。": "Edição assumida. Projeto atualizado.",
+  "接管未完成，请检查当前租约并重试。": "A retomada não foi concluída. Verifique a permissão atual e tente novamente.",
+  "接管编辑": "Assumir edição",
+  "正在接管…": "Assumindo…",
+  "确认接管": "Confirmar retomada",
+  "确认接管编辑": "Confirmar retomada da edição",
+  "租约剩余 {0} 秒": "A permissão expira em {0} s",
+  "租约已变化，请确认当前 Agent 后重试。": "A permissão mudou. Verifique o agente atual antes de tentar novamente."
 }

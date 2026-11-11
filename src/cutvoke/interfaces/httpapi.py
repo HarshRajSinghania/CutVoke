@@ -2297,6 +2297,11 @@ class HttpApi:
                     and parts[4] == "edit-lock" and parts[5] == "release":
                 return 200, self.service.release_edit_lease_status(pid, body.get('leaseId', ''))
 
+            if method == "POST" and len(parts) == 6 \
+                    and parts[4] == "edit-lock" and parts[5] == "takeover":
+                return 200, self.service.takeover_edit_lease(
+                    pid, body.get("leaseId", ""), actor=Actor("human", "web-editor"))
+
             if method == "GET" and len(parts) == 4:
                 proj = self.service.get_project(pid)
                 return 200, proj.to_dict()

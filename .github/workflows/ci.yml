@@ -156,19 +156,24 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
       - name: Run full editor scenarios
+        id: editor_scenarios
         timeout-minutes: 40
         working-directory: apps/editor
-        run: npm run test:e2e
+        run: npm run test:e2e -- --output=../../.artifacts/test-results/full
       - name: Repeat deterministic state orderings
+        # Complete independent regressions after a scenario failure. Keep each
+        # output directory separate so a later run cannot erase earlier traces.
+        if: ${{ !cancelled() && (steps.editor_scenarios.outcome == 'success' || steps.editor_scenarios.outcome == 'failure') }}
         # Give each existing regression group its own step budget. Their
         # combined hosted duration can exceed 15min even when all tests pass.
         timeout-minutes: 15
         working-directory: apps/editor
-        run: npm run test:e2e:regressions:state
+        run: npm run test:e2e:regressions:state -- --output=../../.artifacts/test-results/state
       - name: Repeat preview recovery and transcript orderings
+        if: ${{ !cancelled() && (steps.editor_scenarios.outcome == 'success' || steps.editor_scenarios.outcome == 'failure') }}
         timeout-minutes: 15
         working-directory: apps/editor
-        run: npm run test:e2e:regressions:recovery
+        run: npm run test:e2e:regressions:recovery -- --output=../../.artifacts/test-results/recovery
       - name: Preserve browser failure diagnostics
         if: failure()
         uses: actions/upload-artifact@v7

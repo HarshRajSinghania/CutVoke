@@ -2217,7 +2217,7 @@ class RenderService:
         return {'status':'passed' if reports else 'not_required','comparison':'independent-seam-frames',
                 'sampleWidth':width,'sampleHeight':height,'boundaries':reports}
 
-    def _render_continuous_audio(self, seq, out_path, start, duration, cancel_event=None):
+    def _render_continuous_audio(self, seq, out_path, start, duration, cancel_event=None, *, clock_end=None):
         """Render only the original mixer, once, without decoding visual layers."""
         audio_seq = copy.deepcopy(getattr(self._render_ctx, 'export_audio_sequence', None) or seq)
         # _compile supplies a dummy canvas for audio-only sequences. Its nullsink
@@ -2254,7 +2254,10 @@ class RenderService:
             # Consume the finite 16px clock as an actual null output. FFmpeg 7
             # can abort its scheduler when this independent overlay/scale graph
             # ends in nullsink while only the audio component has an output.
-            command += ['-map', '[outv]', '-an', '-f', 'null', '-']
+            command += ['-map', '[outv]', '-an']
+            if clock_end is not None:
+                command += ['-t', f'{clock_end:.9f}']
+            command += ['-f', 'null', '-']
             process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                        stderr=subprocess.PIPE, cwd=caption_cwd)
             try:
@@ -2335,6 +2338,26 @@ class RenderService:
                 "recoveryMode": getattr(self._render_ctx, "window_recovery_mode", None),
                 "videoEncoder": getattr(self._render_ctx, "video_encoder", "libx264"),
                 "encoderFallback": getattr(self._render_ctx, "encoder_fallback", False)}
+
+    def render_audio_window(self, project: Project, out_path: str,
+                            start: float, duration: float,
+                            cancel_event: Optional[threading.Event] = None) -> dict[str, Any]:
+        """Inspect the same continuous PCM mixer used by export, on its sample clock.
+
+        Callers own temporary output cleanup and scheduling. This intentionally
+        retains the original mixer history (effects can depend on earlier audio).
+        """
+        # Resolve semantic controls, but never prepare/rasterize visual effects:
+        # they can replace a video source with a silent intermediate.
+        from cutvoke.domain.essential_properties import resolve as resolve_compositions
+        from cutvoke.domain.spatial_path import resolve as resolve_spatial_paths
+        from cutvoke.domain.controllers import resolve as resolve_controllers
+        project = resolve_controllers(resolve_spatial_paths(resolve_compositions(project)))
+        if any(c.nested is not None for t in project.sequence.tracks for c in t.clips):
+            raise RenderError("audio inspection of nested compounds is not supported; review an export instead")
+        has_audio, warnings = self._render_continuous_audio(
+            project.sequence, out_path, start, duration, cancel_event, clock_end=start + duration)
+        return {"has_audio": has_audio, "warnings": warnings}
 
     def render_audio_only(self, project: Project, out_path: str,
                           overwrite: bool = False,
