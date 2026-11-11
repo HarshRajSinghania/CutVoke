@@ -88,6 +88,10 @@ AGENT_TOOLS = [
            "times": {"type": "array", "minItems": 1, "maxItems": 6,
                      "items": {"type": "number", "minimum": 0}},
            "width": {"type": "integer", "minimum": 160, "maximum": 1920, "default": 960}}, ("times",)),
+    _tool("preview_audio", "Inspect composed timeline audio around a cut. Returns stereo WAV audio plus per-channel peak bins from the same samples, with revision and sample-clock bounds. Read-only, one window up to 5 seconds; nested compounds are rejected; mixer preparation can time out on complex projects. Peaks are not speech recognition or proof of a clean edit.",
+          {**REVISION, "time": {"type": "number", "minimum": 0},
+           "radius": {"type": "number", "minimum": 0.05, "maximum": 2.5, "default": 0.5}},
+          ("projectId", "expectedRevision", "time")),
     _tool("preview_prepare", "异步准备完整的连续预览；返回 jobId，随后调用 preview_job 查询或取消。视频底层含文字轨，字幕由人类编辑器叠加；视觉验收用 preview_frames。",
           REVISION, ("projectId", "expectedRevision")),
     _tool("preview_job", "查询/取消预览任务；完成返回本机可播放文件路径。标准 MCP 自动更新保留任务；整个服务关闭后可重新提交并复用磁盘缓存。",
@@ -483,6 +487,12 @@ class AgentTools:
             frames.append({"time": at, "path": path, "mimeType": "image/png", "empty": False})
             images.append({"type": "image", "mimeType": "image/png", "data": base64.b64encode(data).decode()})
         return {"projectId": a.get("projectId"), "revision": project.revision, "frames": frames, "_images": images}
+
+    def preview_audio(self, a):
+        from cutvoke.rendering.audio_inspection import inspect_audio
+        project = self._project(a)
+        return inspect_audio(self.render, self.api._audio_scheduler, project,
+                             a["time"], a.get("radius", 0.5))
 
     def preview_prepare(self, a):
         return self.api._preview_preparation.submit(self._project(a))
