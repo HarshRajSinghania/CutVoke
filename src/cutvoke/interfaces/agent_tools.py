@@ -83,6 +83,12 @@ AGENT_TOOLS = [
           {"query": {"type": "string"}, "family": {"type": "string", "enum": ["fx", "transition", "animation", "text", "filter", "sticker", "personFx"]},
            "appliesTo": {"type": "string", "enum": ["image", "video", "audio", "text"]},
            "presetId": STRING, **PAGE}),
+    _tool("preview_compare", "Render same-timestamp before/after PNG pairs for a preview-supported command without committing it. Requires the current revision; at most 3 times / 6 images, ordered before then after for each time. Both sides include captions. Times must exist in both timelines. Local preview cache files are created; project, history and revision stay unchanged. Recheck revision before applying the command.",
+          {**REVISION, "type": STRING, "payload": {"type": "object"},
+           "times": {"type": "array", "minItems": 1, "maxItems": 3,
+                     "items": {"type": "number", "minimum": 0}},
+           "width": {"type": "integer", "minimum": 160, "maximum": 1920, "default": 960}},
+          ("projectId", "expectedRevision", "type", "payload", "times")),
     _tool("preview_frames", "查看工程或素材在指定秒数的实际画面，返回 PNG 图片供视觉检查。工程画面含文字轨和字幕，并标注渲染 revision；一次最多 6 帧。",
           {**REVISION, "assetId": STRING, "path": STRING,
            "times": {"type": "array", "minItems": 1, "maxItems": 6,
@@ -424,6 +430,33 @@ class AgentTools:
         return {'projectId':a['projectId'],'revision':project.revision,'clipId':clip.id,'fractions':fractions,
                 'effectiveDuration':duration,
                 'variants':variants,'_images':images}
+
+    def preview_compare(self, a):
+        from cutvoke.domain.protocol import Actor, Command
+        result = self.service.preview_command(Command(
+            type=a["type"], payload=a["payload"], project_id=a["projectId"],
+            expected_revision=a["expectedRevision"], actor=Actor("mcp", "agent")),
+            include_project=True, include_before_project=True)
+        before, after = result.pop("beforeProject"), result.pop("project")
+        # Validate both bounds before producing any images, especially after cuts.
+        for label, project in (("before", before), ("after", after)):
+            duration = self.render._sequence_duration(project.sequence)
+            if any(at >= duration for at in a["times"]):
+                raise ValueError(f"times must be before the {label} timeline end ({duration}s)")
+        pairs, images = [], []
+        for at in a["times"]:
+            pair = {"time": at}
+            for label, project in (("before", before), ("after", after)):
+                rendered = self.preview_frames({"projectId": a["projectId"],
+                    "times": [at], "width": a.get("width", 960)}, _project_override=project)
+                frame = dict(rendered["frames"][0])
+                # Empty frames have no image block; indices make correspondence explicit.
+                frame["imageIndex"] = len(images) if rendered["_images"] else None
+                pair[label] = frame
+                images.extend(rendered["_images"])
+            pairs.append(pair)
+        return {"projectId": a["projectId"], "revision": before.revision,
+                "candidate": True, **result, "pairs": pairs, "_images": images}
 
     def preview_frames(self, a, _project_override=None):
         from cutvoke.rendering.preview_prepare import preview_identity
