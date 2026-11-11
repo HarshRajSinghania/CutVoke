@@ -2015,7 +2015,8 @@ class EditService:
                     f"track {track.id} is locked; unlock it before editing its clips",
                 )
 
-    def preview_command(self, command: Command, *, include_project: bool = False) -> dict:
+    def preview_command(self, command: Command, *, include_project: bool = False,
+                        include_before_project: bool = False) -> dict:
         """试算一个编辑命令（P4 AI 接续）：在候选副本上执行 handler 并校验，
         但**不提交、不持久化、不提 revision**，返回「会发生什么」。
 
@@ -2024,7 +2025,7 @@ class EditService:
         execute 同语义抛 EditError（版本冲突 / 参数非法 / 不变量违反），
         且内存状态零变化。
         """
-        proj = self.get_project(command.project_id)
+        proj = copy.deepcopy(self.get_project(command.project_id))
         if command.expected_revision != proj.revision:
             raise EditError(
                 ErrorCode.REVISION_CONFLICT,
@@ -2082,6 +2083,8 @@ class EditService:
         result = {"valid": True, "changedEntities": impact, "commandType": command.type}
         if include_project:
             result["project"] = candidate
+        if include_before_project:
+            result["beforeProject"] = proj
         return result
 
     def machine_schema(self, lang: str = "zh-CN") -> dict:

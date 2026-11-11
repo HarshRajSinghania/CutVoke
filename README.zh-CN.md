@@ -171,6 +171,8 @@ Agent 持有编辑租约时，编辑器显示持有者和剩余时间。点击**
 
 ### 方式二：接入 AI Agent（Claude Desktop / Cursor 等 MCP 客户端）
 
+可用 `preview_compare` 进行画面对比预演：传入 `projectId`、当前 `expectedRevision`、命令 `type`/`payload` 和 1–3 个秒数 `times`。工具从同一工程快照返回包含字幕的修改前/后 PNG，不提交编辑。时间点必须位于两侧时间线内；`imageIndex` 是对应图片块的零基索引（不计 JSON 文本块）。检查后再用最新版本提交。工具会生成本地预览缓存，但拒绝导出和音频处理等外部副作用命令。这是同一时间点对比，不是波纹剪辑后的源时间对齐。
+
 异步导出返回 `jobId`；按 `export_job` 返回的 `pollAfterSeconds` 等待后再查询（queued/running 时当前为 1 秒）。提示为 null 表示任务已到终态，应停止轮询并查看结果或错误。始终设置有界超时。
 
 1. 先启动一次桌面版。它会在数据目录写出 `profile/mcp-config.json`，其中包含内置引擎的绝对路径和你的工程库位置。把里面的 `cutvoke` 配置复制到 MCP 客户端（如 `claude_desktop_config.json` 或 `.cursor/mcp.json`），格式大致如下：

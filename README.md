@@ -171,6 +171,8 @@ No Python or Node.js setup required. Download the latest pre-built package for y
 
 ### Option 2: Connect Your AI Agent (Claude Desktop / Cursor / MCP Clients)
 
+For a visual dry-run, call `preview_compare` with `projectId`, current `expectedRevision`, command `type`/`payload`, and 1–3 `times` (seconds). It returns before/after PNG pairs from the same snapshot, including captions, without committing the edit. Times must fit both timelines; `imageIndex` maps each nonempty side to its image block (zero-based, excluding the JSON text block). Check the pairs, then apply with the latest revision. Local preview-cache files are created; export/audio side-effect commands are rejected. This is a same-timestamp comparison, not source-time alignment after ripple edits.
+
 Async exports return a `jobId`; poll `export_job` after its `pollAfterSeconds` delay (currently 1 second while queued/running). A null hint means the job is terminal; stop polling and inspect its result or error. Use a bounded timeout.
 
 1. Launch the desktop app once. It writes `profile/mcp-config.json` in the CutVoke data folder with the absolute path of the bundled engine and your project library. Copy its `cutvoke` entry into your MCP client (e.g., `claude_desktop_config.json` or `.cursor/mcp.json`). It looks like this:
