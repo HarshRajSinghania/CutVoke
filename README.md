@@ -163,7 +163,7 @@ No Python or Node.js setup required. Download the latest pre-built package for y
 | **macOS** | Intel (x64) | [`CutVoke-0.3.5-macos-x64.zip`](https://github.com/frankShan001/CutVoke/releases/download/v0.3.5/CutVoke-0.3.5-macos-x64.zip) |
 | **Linux** | x64 | [`CutVoke-0.3.5-linux-x64.tar.gz`](https://github.com/frankShan001/CutVoke/releases/download/v0.3.5/CutVoke-0.3.5-linux-x64.tar.gz) |
 
-> **Note**: Ensure [`ffmpeg` and `ffprobe`](https://ffmpeg.org/download.html) are available on your system PATH if not bundled in your environment. See [Pre-release Notes](docs/development/prerelease.md) for platform launch details.
+> **Note**: Desktop packages include FFmpeg and ffprobe; no system FFmpeg setup is needed. Only source installs (Option 3) require [`ffmpeg` and `ffprobe`](https://ffmpeg.org/download.html) on PATH. See [Pre-release Notes](docs/development/prerelease.md) for platform launch details.
 
 ### Option 2: Connect Your AI Agent (Claude Desktop / Cursor / MCP Clients)
 
@@ -187,25 +187,32 @@ Use the values from your own file rather than this sketch. Per-client steps: [Cl
 
 ### Option 3: Run from Source (For Developers & Power Users)
 
-**Prerequisites**: Python `3.10+`, Node.js `18+`, and `ffmpeg` / `ffprobe` installed in system `PATH`.
+**Prerequisites**: Python `3.10+`, Node.js `20+` (CI uses Node.js `24`), and `ffmpeg` / `ffprobe` installed in system `PATH`. See [installation and tested environments](docs/user/installation.md) for required codecs and platform details.
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/frankShan001/CutVoke.git
 cd CutVoke
 
-# 2. Install the Python engine & CLI (using uv or pip)
-uv sync --extra dev
-# Or with standard pip:
-pip install -e ".[dev]"
-
-# 3. Start the Web Editor UI
-cd apps/editor
-npm install
-npm run dev
+# 2. Create a virtual environment
+python -m venv .venv
 ```
 
-Open `http://localhost:5173` in your browser (or run `start-cutvoke.cmd` on Windows).
+Before continuing, activate it with `source .venv/bin/activate` on Linux/macOS, or `.\.venv\Scripts\Activate.ps1` in Windows PowerShell. Then:
+
+```bash
+python -m pip install -e .
+
+# 3. Build the Web Editor and start the local service
+cd apps/editor
+npm ci
+npm run build
+cd ../..
+cutvoke doctor --json
+cutvoke serve
+```
+
+Open `http://127.0.0.1:8787` in your browser. Windows users can alternatively run `start-cutvoke.cmd --web` to start the browser workflow. This serves the built editor and its API together. `npm run dev` starts only Vite, not the CutVoke backend, so it is not the standalone installation flow. For contributor dependencies and checks, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 #### Built-in CLI Commands
 
