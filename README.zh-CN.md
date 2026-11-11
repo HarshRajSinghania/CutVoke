@@ -167,6 +167,8 @@ CutVoke 采用非破坏性、声明式的共享时间线架构，打通了桌面
 
 ### 方式二：接入 AI Agent（Claude Desktop / Cursor 等 MCP 客户端）
 
+异步导出返回 `jobId`；按 `export_job` 返回的 `pollAfterSeconds` 等待后再查询（queued/running 时当前为 1 秒）。提示为 null 表示任务已到终态，应停止轮询并查看结果或错误。始终设置有界超时。
+
 1. 先启动一次桌面版。它会在数据目录写出 `profile/mcp-config.json`，其中包含内置引擎的绝对路径和你的工程库位置。把里面的 `cutvoke` 配置复制到 MCP 客户端（如 `claude_desktop_config.json` 或 `.cursor/mcp.json`），格式大致如下：
 
 ```json

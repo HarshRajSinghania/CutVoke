@@ -38,7 +38,7 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 | 获取编辑权 | `edit_lock` 获取租约，并在长任务中续租。人工界面可查看修改，完成或失败后都释放租约。 |
 | 提交编辑 | 支持预演的命令先用 `command_preview`；组合修改用 `edit.batch`，作为一次撤销操作。提交时带 `expectedRevision`、`editLeaseId` 和稳定的 `commandId`。 |
 | 验收画面 | 在关键帧、转场前后和字幕显示区间调用 `preview_frames`。图片包含文字与字幕；编辑器连续预览的字幕由可编辑叠层显示。 |
-| 预览/导出 | `preview_prepare` + `preview_job` 准备连续预览；`export.enqueue` + `export_job` 执行异步导出。间隔约 1 秒查询，保留任务 ID；支持取消。 |
+| 预览/导出 | `preview_prepare` + `preview_job` 准备连续预览；`export.enqueue` + `export_job` 执行异步导出。预览间隔约 1 秒查询；导出按 `export_job.pollAfterSeconds` 等待再查询，保留任务 ID；支持取消。 |
 | 人工接手 | `project_events` 核对修改；释放租约后人工继续编辑同一工程。`project_package` 打包工程和素材以供交接。 |
 
 ## 精确修改一句字幕
@@ -81,3 +81,9 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 
 
 创作型任务可先用 `creative_workflow({"operation":"list","query":"旅行","locale":"zh-CN"})` 找配方，再取单张详情和 plan/review/repair schema。审片记录须附当前 projectId/revision/sequenceId、实际成片或抽帧证据；局部修复使用 `preview-repair`，显式提交后重新生成证据。详见[可执行创作闭环](../../skills/cutvoke-editor/references/creative-workflow.md)。此入口不自动判断艺术质量，不打开证据文件，也不替代事实与原意核对。
+
+### 导出轮询等待提示
+
+`export_job` 的状态查询和取消响应都包含 `pollAfterSeconds`：`queued` / `running` 为正数秒（当前为 `1`），`succeeded` / `failed` / `cancelled` / `interrupted` 为 `null`。`null` 表示停止轮询，不是立即重试。成功时读取 `result.output_path`，其他终态检查 `error`；始终设置有界超时并保留 `jobId`。该字段只提示下次查询间隔，不是预计完成时间。
+
+此字段是向后兼容的响应扩展，适用于 MCP 和 HTTP agent 接口、内存队列和 SQLite 账本中的任务（包括旧任务）。`export.enqueue` 的回执保持不变；收到 `jobId` 后查询 `export_job` 获取当前状态和等待提示。

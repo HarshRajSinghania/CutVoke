@@ -236,7 +236,7 @@ RECIPES = {
         "steps": [
             {"tool": "command_preview", "arguments": {"projectId": "<PROJECT>", "expectedRevision": "<REVISION>", "type": "project.preflight", "payload": {}}},
             {"tool": "command_apply", "arguments": {"projectId": "<PROJECT>", "expectedRevision": "<REVISION>", "commandId": "<COMMAND_ID>", "type": "export.enqueue", "payload": {"outPath": "<ABSOLUTE_MP4_PATH>", "quality": "high", "overwrite": False}}},
-            {"tool": "export_job", "arguments": {"projectId": "<PROJECT>", "jobId": "<JOB_ID>"}, "repeat": "About once per second until status=succeeded; use result.output_path. Stop and read error on failed/cancelled/interrupted, or report a bounded timeout."},
+            {"tool": "export_job", "arguments": {"projectId": "<PROJECT>", "jobId": "<JOB_ID>"}, "repeat": "Wait pollAfterSeconds seconds between export_job calls while status is queued/running (currently 1). pollAfterSeconds=null means terminal: stop polling, use result.output_path on succeeded, or read error on failed/cancelled/interrupted. Keep a bounded timeout."},
             {"tool": "project_package", "arguments": {"projectId": "<PROJECT>", "expectedRevision": "<REVISION>", "outPath": "<ABSOLUTE_PACKAGE_PATH>"}}]},
 }
 

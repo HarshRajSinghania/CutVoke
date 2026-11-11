@@ -167,6 +167,8 @@ No Python or Node.js setup required. Download the latest pre-built package for y
 
 ### Option 2: Connect Your AI Agent (Claude Desktop / Cursor / MCP Clients)
 
+Async exports return a `jobId`; poll `export_job` after its `pollAfterSeconds` delay (currently 1 second while queued/running). A null hint means the job is terminal; stop polling and inspect its result or error. Use a bounded timeout.
+
 1. Launch the desktop app once. It writes `profile/mcp-config.json` in the CutVoke data folder with the absolute path of the bundled engine and your project library. Copy its `cutvoke` entry into your MCP client (e.g., `claude_desktop_config.json` or `.cursor/mcp.json`). It looks like this:
 
 ```json
