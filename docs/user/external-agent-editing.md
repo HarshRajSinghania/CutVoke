@@ -33,7 +33,7 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 | 找工程 | `project_list` 按名称搜索；`project_summary` 获取版本和时间线摘要。 |
 | 保留原工程 | 需要制作不同版本时，调用 `project_clone`，明确新 ID 和名称。 |
 | 找素材 | `media_import` 导入本机文件，返回可直接用于 `clip.insert` 的 `assetId`；`media_list` 查已用/未用素材，`media_inspect` 查尺寸、时长和音视频流。 |
-| 看素材 | `preview_frames` 检查素材或工程，每次最多 6 个时间点，直接返回真实 PNG 内容。音频使用 `media_inspect` 和音频分析命令。 |
+| 看素材 | `preview_frames` 检查素材或工程，每次最多 6 个时间点，直接返回真实 PNG 内容。源音频信息使用 `media_inspect` 和音频分析命令；剪切点的成片混音使用 `preview_audio`，传当前 `expectedRevision`、时间点 `time` 和可选半径 `radius`（默认 0.5 秒，最大 2.5 秒）。返回带 revision 的双声道 WAV 与同一样本的峰值，不能代替语义判断或最终导出试听。 |
 | 查编辑参数 | `commands_list` 查具体命令；`resources_list` 搜索预设；`effects_list` 查效果参数和可动画属性。不要猜参数或预设 ID。 |
 | 获取编辑权 | `edit_lock` 获取租约，并在长任务中续租。人工界面可查看修改，完成或失败后都释放租约。 |
 | 提交编辑 | 支持预演的命令先用 `command_preview`；组合修改用 `edit.batch`，作为一次撤销操作。提交时带 `expectedRevision`、`editLeaseId` 和稳定的 `commandId`。 |
