@@ -9,6 +9,8 @@ export default defineConfig(base, {
     ...(base.webServer as object),
     reuseExistingServer: false,
     env: {
+      PYTHONUTF8: '1',
+      PYTHONIOENCODING: 'utf-8',
       CUTVOKE_E2E_PORT: process.env.CUTVOKE_E2E_PORT || '8799',
       CUTVOKE_E2E_FOLDERS: '1',
       CUTVOKE_EFFECTS_PATH: resolve('../../effects/transitions'),
