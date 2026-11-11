@@ -152,6 +152,8 @@ Agent 持有编辑租约时，编辑器显示持有者和剩余时间。点击**
 - **内置五大题材剪辑规范（`skills/cutvoke-editor/`）**：预置面向 **MV/音乐视觉**（[`music-video.md`](skills/cutvoke-editor/references/workflows/music-video.md)）、**纪录片/Vlog**（[`documentary.md`](skills/cutvoke-editor/references/workflows/documentary.md)）、**剧情叙事**（[`narrative.md`](skills/cutvoke-editor/references/workflows/narrative.md)）、**知识解说/教程**（[`explainer.md`](skills/cutvoke-editor/references/workflows/explainer.md)）与 **产品宣传片**（[`showcase.md`](skills/cutvoke-editor/references/workflows/showcase.md)）的专业 Agent 剪辑指南。
 - **CLI、HTTP API 与代码视频自动化**：支持脚本化批量渲染视频、导入经过校验的外部代码生成视频素材，或集成进你自己的自动化媒体工作流。
 
+代码视频交接时，工程包携带已引用素材经校验的源码 ZIP。`generated_source` 可查询、检查归档，并显式恢复到新目录，不执行源代码，也不认证艺术效果。缓存索引不随工程包迁移；保留完整工程目录才能保留索引。见[代码视频桥接与源码恢复示例](examples/generated-media/README.md)和[缓存渲染](docs/user/generated-render.md)。
+
 ## 快速开始
 
 ### 方式一：下载桌面免安装版（推荐普通创作者）

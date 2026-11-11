@@ -152,6 +152,8 @@ Once CutVoke is connected to Claude Desktop, Cursor, or any MCP client, you can 
 - **Pre-Built Agent Skills (`skills/cutvoke-editor/`)**: Includes specialized editing guides for **Music Videos** ([`music-video.md`](skills/cutvoke-editor/references/workflows/music-video.md)), **Documentaries & Vlogs** ([`documentary.md`](skills/cutvoke-editor/references/workflows/documentary.md)), **Narrative Films** ([`narrative.md`](skills/cutvoke-editor/references/workflows/narrative.md)), **Explainers & Tutorials** ([`explainer.md`](skills/cutvoke-editor/references/workflows/explainer.md)), and **Product Showcases** ([`showcase.md`](skills/cutvoke-editor/references/workflows/showcase.md)).
 - **CLI, HTTP API & Code-Video Automation**: Batch-render videos, import verified code-generated animations, or integrate CutVoke into custom media pipelines.
 
+For code-video handoffs, editable packages carry verified source ZIPs for referenced media. `generated_source` lists and inspects these archives and explicitly restores inputs into a new directory without executing code or certifying artistic quality. Render-cache indexes stay outside the package; keep the full project directory to retain them. See the [code-video bridge and source recovery example](examples/generated-media/README.md) and [cached rendering](docs/user/generated-render.md).
+
 ## Get Started
 
 ### Option 1: Download the Portable Desktop App (Recommended for Creators)
