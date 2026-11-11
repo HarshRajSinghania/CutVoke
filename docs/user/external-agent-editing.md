@@ -87,3 +87,26 @@ MCP 客户端的 `command` 应填写展开后的绝对路径，`args` 填写 `["
 `export_job` 的状态查询和取消响应都包含 `pollAfterSeconds`：`queued` / `running` 为正数秒（当前为 `1`），`succeeded` / `failed` / `cancelled` / `interrupted` 为 `null`。`null` 表示停止轮询，不是立即重试。成功时读取 `result.output_path`，其他终态检查 `error`；始终设置有界超时并保留 `jobId`。该字段只提示下次查询间隔，不是预计完成时间。
 
 此字段是向后兼容的响应扩展，适用于 MCP 和 HTTP agent 接口、内存队列和 SQLite 账本中的任务（包括旧任务）。`export.enqueue` 的回执保持不变；收到 `jobId` 后查询 `export_job` 获取当前状态和等待提示。
+
+## 人工提前接管租约
+
+编辑器显示 Agent 的租约持有者和剩余秒数。点击「接管编辑」，核对后确认，
+即可结束当前观察到的指定租约；取消不会发送接管请求。接管保留已提交的修改，
+刷新工程成功后才恢复人工编辑。失败时保持只读并允许重试；如果租约已被替换，
+界面显示新持有者，必须重新确认，不能撤销替换后的租约。
+
+本地编辑器调用 `POST /api/v1/projects/{projectId}/edit-lock/takeover`，
+请求体为 `{"leaseId":"当前观察到的租约 ID"}`。响应包含 `status`、`takenOver`、
+`locked` 和 `lease`。重复接管已经结束的租约不会重复写入审计记录。
+审计使用 `edit.lease.takenOver` 事件，记录本地编辑器 `human/web-editor`、
+原持有者、租约 ID、时间和接管时的 revision；它不是剪辑，不推进 revision、
+不增加撤销历史，也不能在活动抽屉中「撤销到此」。按 revision 读取事件时，
+接管事件可在相同 revision 再次返回，客户端应按 `eventId` 去重。
+
+Agent 必须在每次写入中携带取得的 `editLeaseId`。失效、过期或被替换的 token
+会得到不可自动重试的 `EDIT_LEASE_INVALID`：重新读取工程并等待新的人工交接，再取得新租约后
+重新规划操作；不要原样重发旧 token。续租以及使用旧 ID 再次 acquire 同样失败。
+已经成功提交的相同 `commandId`/请求仍可重放原回执，不产生新写入。
+校验覆盖 SQLite 最终写入事务，包括字幕导入、重命名和旧工程库的全局路径迁移维护命令。
+既有不携带 token 的人工操作继续兼容；actor 是现有本地接口的来源标记，
+此功能不增加用户认证，也不提供轨道级并行租约或租约变更回顾。
