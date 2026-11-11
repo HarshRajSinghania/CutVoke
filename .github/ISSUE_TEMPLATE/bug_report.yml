@@ -51,14 +51,14 @@ body:
     attributes:
       label: Environment
       description: >-
-        Include your OS version and architecture. Desktop users do not need system Python or the cutvoke command;
-        paste the last ~50 relevant lines of profile/logs/engine.log in Logs below.
-        Find it inside CutVoke Data next to the Windows exe, ~/Library/Application Support/CutVoke/ on macOS,
-        or ${XDG_DATA_HOME:-~/.local/share}/CutVoke/ on Linux.
-        Source users should include Python, Node.js, browser and FFmpeg versions plus cutvoke doctor --json
-        (cutvoke doctor --mcp-only --json for MCP-only installs).
-        请填写系统版本与架构。桌面版无需系统 Python 或 cutvoke 命令，请在下方日志栏粘贴上述数据目录中
-        profile/logs/engine.log 末尾约 50 行相关内容；源码版请附上各依赖版本和 doctor 输出。
+        Include your OS version and architecture. Desktop users do not need system Python or the `cutvoke` command;
+        paste the last approximately 50 relevant lines of `profile/logs/engine.log` in Logs below.
+        Find it inside `CutVoke Data` next to the Windows exe, `~/Library/Application Support/CutVoke/` on macOS,
+        or `${XDG_DATA_HOME:-~/.local/share}/CutVoke/` on Linux.
+        Source users should include Python, Node.js, browser and FFmpeg versions plus `cutvoke doctor --json`
+        (`cutvoke doctor --mcp-only --json` for MCP-only installs).
+        请填写系统版本与架构。桌面版无需系统 Python 或 `cutvoke` 命令，请在下方日志栏粘贴上述数据目录中
+        `profile/logs/engine.log` 末尾约 50 行相关内容；源码版请附上各依赖版本和 doctor 输出。
         Remove private paths, tokens and media from all output. 所有输出请先移除私人路径、令牌及媒体信息。
       placeholder: |
         OS: Windows 11
