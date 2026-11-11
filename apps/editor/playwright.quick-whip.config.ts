@@ -1,0 +1,17 @@
+import { defineConfig } from '@playwright/test';
+import { resolve } from 'node:path';
+import base from './playwright.config';
+
+export default defineConfig(base, {
+  testDir: './qa',
+  testMatch: 'quick-whip.spec.ts',
+  webServer: {
+    ...(base.webServer as object),
+    reuseExistingServer: false,
+    env: {
+      CUTVOKE_E2E_PORT: process.env.CUTVOKE_E2E_PORT || '8799',
+      CUTVOKE_E2E_FOLDERS: '1',
+      CUTVOKE_EFFECTS_PATH: resolve('../../effects/transitions'),
+    },
+  },
+});
