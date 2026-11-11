@@ -128,6 +128,8 @@ CutVoke 采用非破坏性、声明式的共享时间线架构，打通了桌面
         └─────────────────────────────────────────────────┘
 ```
 
+Agent 持有编辑租约时，编辑器显示持有者和剩余时间。点击**接管编辑**可结束指定租约，并在刷新工程后继续手工编辑；已完成的修改会保留，携带旧租约的请求会被拒绝。
+
 ### 你可以直接对 AI Agent 说的话（Prompt 示例）
 
 将 CutVoke 接入 Claude Desktop、Cursor 或任意支持 MCP 的智能体后，你可以把繁琐的机械操作交给 AI，自己专注于审美把控：
@@ -165,9 +167,11 @@ CutVoke 采用非破坏性、声明式的共享时间线架构，打通了桌面
 | **macOS** | Intel 芯片 (x64) | [`CutVoke-0.3.5-macos-x64.zip`](https://github.com/frankShan001/CutVoke/releases/download/v0.3.5/CutVoke-0.3.5-macos-x64.zip) |
 | **Linux** | 64位 (x64) | [`CutVoke-0.3.5-linux-x64.tar.gz`](https://github.com/frankShan001/CutVoke/releases/download/v0.3.5/CutVoke-0.3.5-linux-x64.tar.gz) |
 
-> **提示**：请确保系统环境变量 `PATH` 中已安装 [`ffmpeg` 与 `ffprobe`](https://ffmpeg.org/download.html)。各系统首次启动说明可参考 [预发布说明](docs/development/prerelease.md)。
+> **提示**：桌面版已内置 FFmpeg 和 ffprobe，无需另行配置系统 FFmpeg。仅源码安装（方式三）需要将 [`ffmpeg` 与 `ffprobe`](https://ffmpeg.org/download.html) 配置到 `PATH`。各系统首次启动说明可参考 [预发布说明](docs/development/prerelease.md)。
 
 ### 方式二：接入 AI Agent（Claude Desktop / Cursor 等 MCP 客户端）
+
+异步导出返回 `jobId`；按 `export_job` 返回的 `pollAfterSeconds` 等待后再查询（queued/running 时当前为 1 秒）。提示为 null 表示任务已到终态，应停止轮询并查看结果或错误。始终设置有界超时。
 
 1. 先启动一次桌面版。它会在数据目录写出 `profile/mcp-config.json`，其中包含内置引擎的绝对路径和你的工程库位置。把里面的 `cutvoke` 配置复制到 MCP 客户端（如 `claude_desktop_config.json` 或 `.cursor/mcp.json`），格式大致如下：
 
@@ -189,25 +193,32 @@ CutVoke 采用非破坏性、声明式的共享时间线架构，打通了桌面
 
 ### 方式三：从源码启动（面向开发者与进阶玩家）
 
-**前置环境**：Python `3.10+`、Node.js `18+`，且系统 `PATH` 中已配置好 `ffmpeg` 与 `ffprobe`。
+**前置环境**：Python `3.10+`、Node.js `20+`（CI 使用 Node.js `24`），且系统 `PATH` 中已配置好 `ffmpeg` 与 `ffprobe`。所需编解码器及各平台说明见 [安装与已验证环境](docs/user/installation.md)。
 
 ```bash
 # 1. 克隆仓库
 git clone https://github.com/frankShan001/CutVoke.git
 cd CutVoke
 
-# 2. 安装 Python 核心引擎与 CLI（推荐使用 uv，也支持 pip）
-uv sync --extra dev
-# 或者使用传统 pip：
-pip install -e ".[dev]"
-
-# 3. 启动 Web 剪辑器前端界面
-cd apps/editor
-npm install
-npm run dev
+# 2. 创建虚拟环境
+python -m venv .venv
 ```
 
-启动后在浏览器访问 `http://localhost:5173`（Windows 用户也可直接双击运行根目录的 `start-cutvoke.cmd`）。
+继续之前，请先激活虚拟环境：Linux/macOS 运行 `source .venv/bin/activate`，Windows PowerShell 运行 `.\.venv\Scripts\Activate.ps1`。然后执行：
+
+```bash
+python -m pip install -e .
+
+# 3. 构建 Web 剪辑器并启动本地服务
+cd apps/editor
+npm ci
+npm run build
+cd ../..
+cutvoke doctor --json
+cutvoke serve
+```
+
+启动后在浏览器访问 `http://127.0.0.1:8787`。Windows 用户也可改用 `start-cutvoke.cmd --web` 启动浏览器工作流。该服务同时提供构建后的剪辑器和 API。`npm run dev` 只启动 Vite，不会启动 CutVoke 后端，因此不能单独作为安装后的运行流程。贡献者依赖和检查步骤见 [贡献说明](CONTRIBUTING.zh-CN.md)。
 
 #### 内置命令行工具速查
 

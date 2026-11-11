@@ -71,6 +71,10 @@ class EditLeaseConflict(Exception):
     """工程当前被另一个 Agent 编辑租约占用。"""
 
 
+class EditLeaseInvalid(EditLeaseConflict):
+    """A supplied token no longer authorizes a new write."""
+
+
 def _synchronized(fn: Callable) -> Callable:
     """把方法串行化到实例级可重入锁上。
 
@@ -126,9 +130,15 @@ class ProjectStore:
             backup.close()
 
     @_synchronized
-    def relocate_paths(self, **kwargs) -> dict:
+    def relocate_paths(self, *, project_id: Optional[str] = None,
+                       edit_lease_id: str = "", **kwargs) -> dict:
         from cutvoke.storage.workspace_paths import relocate_connection
         with self._transaction():
+            replay = self._conn.execute(
+                "SELECT 1 FROM idempotency WHERE project_id='__workspace__' AND command_id=?",
+                (kwargs.get("command_id"),)).fetchone()
+            if edit_lease_id and replay is None:
+                self._assert_edit_lease(project_id, edit_lease_id)
             return relocate_connection(self._conn, **kwargs)
 
     # ------------------------------------------------------------------
@@ -225,6 +235,13 @@ class ProjectStore:
             )
             """
         )
+        # Never resurrect a retired token, including a delayed acquire request.
+        self._conn.execute(
+            "CREATE TABLE IF NOT EXISTS edit_lease_tokens ("
+            "project_id TEXT NOT NULL, lease_id TEXT NOT NULL, "
+            "PRIMARY KEY(project_id, lease_id))")
+        self._conn.execute(
+            "INSERT OR IGNORE INTO edit_lease_tokens SELECT project_id, lease_id FROM edit_leases")
         # WP-01：持久化撤销历史栈（project_id, depth 序号 -> 提交前快照）
         self._conn.execute(
             """
@@ -366,7 +383,8 @@ class ProjectStore:
                event_payload: Optional[dict] = None,
                history_push: Optional[dict] = None,
                history_clear_redo: bool = False,
-               history_pop_depth: Optional[int] = None) -> None:
+               history_pop_depth: Optional[int] = None,
+               edit_lease_id: str = "") -> None:
         """把一次命令的成功结果作为一个 SQLite 事务原子提交。
 
         关键（A01/A02/A10）：
@@ -386,6 +404,9 @@ class ProjectStore:
                         if history_push is not None else None)
 
         with self._transaction():
+            # Same write transaction as takeover: admission checks alone cannot
+            # fence a command paused in its handler or waiting for SQLite.
+            self._assert_edit_lease(project.project_id, edit_lease_id)
             # 1) 跨进程冲突检测（A01）：库已被别人推进则拒绝
             current_db_rev = self.db_revision(project.project_id)
             if expected_prev_revision is not None and current_db_rev is not None:
@@ -490,6 +511,16 @@ class ProjectStore:
     # Agent 编辑租约（页面可见但写操作只允许租约持有者）
     # ------------------------------------------------------------------
 
+    def _assert_edit_lease(self, project_id: str, lease_id: str) -> None:
+        row = self._conn.execute(
+            "SELECT lease_id, owner, expires_at FROM edit_leases WHERE project_id=?",
+            (project_id,)).fetchone()
+        live = row is not None and float(row[2]) > time.time()
+        if lease_id and (not live or row[0] != lease_id):
+            raise EditLeaseInvalid("Edit lease is invalid. Read the latest project and acquire a new lease.")
+        if not lease_id and live:
+            raise EditLeaseConflict(f"project is being edited by {row[1]}")
+
     @staticmethod
     def _lease_to_dict(row) -> dict:
         return {
@@ -503,27 +534,26 @@ class ProjectStore:
     @_synchronized
     def get_edit_lease(self, project_id: str) -> Optional[dict]:
         """读取有效租约；过期租约会被清理。"""
-        row = self._conn.execute(
-            "SELECT project_id, lease_id, owner, expires_at, acquired_at "
-            "FROM edit_leases WHERE project_id=?", (project_id,)
-        ).fetchone()
-        if row is None:
-            return None
-        if float(row[3]) <= time.time():
-            with self._transaction():
+        with self._transaction():
+            row = self._conn.execute(
+                "SELECT project_id, lease_id, owner, expires_at, acquired_at "
+                "FROM edit_leases WHERE project_id=?", (project_id,)).fetchone()
+            if row is None:
+                return None
+            if float(row[3]) <= time.time():
                 self._conn.execute(
                     "DELETE FROM edit_leases WHERE project_id=? AND lease_id=?",
                     (project_id, row[1]))
-            return None
-        return self._lease_to_dict(row)
+                return None
+            return self._lease_to_dict(row)
 
     @_synchronized
     def acquire_edit_lease(self, *, project_id: str, lease_id: str,
                            owner: str, ttl_seconds: float = 30.0) -> dict:
         """获取或续租指定 lease_id；不同租约在有效期内不能抢占。"""
-        now = time.time()
         ttl = max(5.0, min(float(ttl_seconds), 300.0))
         with self._transaction():
+            now = time.time()
             row = self._conn.execute(
                 "SELECT project_id, lease_id, owner, expires_at, acquired_at "
                 "FROM edit_leases WHERE project_id=?", (project_id,)
@@ -531,6 +561,13 @@ class ProjectStore:
             if row is not None and float(row[3]) > now and row[1] != lease_id:
                 raise EditLeaseConflict(
                     f"project {project_id} is locked by {row[2]}")
+            same_live = row is not None and row[1] == lease_id and float(row[3]) > now
+            if not same_live and self._conn.execute(
+                    "SELECT 1 FROM edit_lease_tokens WHERE project_id=? AND lease_id=?",
+                    (project_id, lease_id)).fetchone():
+                raise EditLeaseInvalid("Edit lease is invalid. Read the latest project and acquire a new lease.")
+            self._conn.execute("INSERT OR IGNORE INTO edit_lease_tokens VALUES (?, ?)",
+                               (project_id, lease_id))
             acquired_at = row[4] if row is not None and row[1] == lease_id else now
             expires_at = now + ttl
             self._conn.execute(
@@ -554,10 +591,10 @@ class ProjectStore:
     def renew_edit_lease(self, *, project_id: str, lease_id: str,
                          ttl_seconds: float = 30.0) -> Optional[dict]:
         """只允许当前租约持有者续租；不存在/已过期返回 None。"""
-        now = time.time()
         ttl = max(5.0, min(float(ttl_seconds), 300.0))
-        expires_at = now + ttl
         with self._transaction():
+            now = time.time()
+            expires_at = now + ttl
             cur = self._conn.execute(
                 "UPDATE edit_leases SET expires_at=? "
                 "WHERE project_id=? AND lease_id=? AND expires_at>?",
@@ -595,6 +632,33 @@ class ProjectStore:
                 return {'status':'not-owner','released':False,'locked':True,'lease':current}
             self._conn.execute('DELETE FROM edit_leases WHERE project_id=?', (project_id,))
             return {'status':'released','released':True,'locked':False,'lease':None}
+
+    @_synchronized
+    def takeover_edit_lease(self, *, project_id: str, lease_id: str,
+                            event_payload: dict) -> dict:
+        """Compare-and-revoke one observed lease, atomically with its audit event."""
+        with self._transaction():
+            row = self._conn.execute(
+                "SELECT project_id, lease_id, owner, expires_at, acquired_at "
+                "FROM edit_leases WHERE project_id=?", (project_id,)).fetchone()
+            if row is None:
+                return dict(status="not-held", takenOver=False, locked=False, lease=None)
+            lease = self._lease_to_dict(row)
+            if row[3] <= time.time():
+                self._conn.execute("DELETE FROM edit_leases WHERE project_id=?", (project_id,))
+                return dict(status="expired", takenOver=False, locked=False, lease=None)
+            if row[1] != lease_id:
+                return dict(status="lease-changed", takenOver=False, locked=True, lease=lease)
+            revision = self.db_revision(project_id)
+            event = dict(event_payload, revision=revision, previousRevision=revision,
+                         changedEntities=[dict(type="editLease", id=lease_id, change="takenOver",
+                                               owner=row[2], at=time.time())])
+            self._conn.execute("DELETE FROM edit_leases WHERE project_id=?", (project_id,))
+            self._conn.execute(
+                "INSERT INTO events (event_id, project_id, payload_json, seq) VALUES (?, ?, ?, ?)",
+                (event["eventId"], project_id, json.dumps(event, ensure_ascii=False),
+                 self._next_event_seq(project_id)))
+            return dict(status="taken-over", takenOver=True, locked=False, lease=None)
 
     @_synchronized
     def peek_history(self, project_id: str, depth: int) -> Optional[str]:
@@ -1001,7 +1065,7 @@ class ProjectStore:
         return out
 
     @_synchronized
-    def rename_project(self, project_id: str, name: str) -> bool:
+    def rename_project(self, project_id: str, name: str, *, edit_lease_id: str = "") -> bool:
         """仅重命名工程，不动 revision / 事件 / 历史。
 
         不存在返回 False；存在则更新 name 并刷新 updated_at，返回 True。
@@ -1011,6 +1075,7 @@ class ProjectStore:
         ).fetchone() is None:
             return False
         with self._transaction():
+            self._assert_edit_lease(project_id, edit_lease_id)
             updated_at = self._next_project_updated_at()
             self._conn.execute(
                 "UPDATE projects SET name=?, updated_at=? WHERE project_id=?",

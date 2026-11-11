@@ -140,7 +140,7 @@ export type EditorAction =
   | { type: "EXPORT_OPEN_SET"; open: boolean }
   | { type: "AGENT_PANEL_OPEN_SET"; open: boolean }
   | { type: "TEMPLATE_OPEN_SET"; open: boolean }
-  | { type: "EDIT_LOCK_SET"; lease: EditLease | null }
+  | { type: "EDIT_LOCK_SET"; projectId: string; lease: EditLease | null }
   | { type: "CAPTION_DRAFT_PREVIEW_SET"; preview: CaptionDraftPreview | null }
   | { type: "TITLE_DRAFT_SET"; clipId: string; projectId: string; version: string; params: Record<string, unknown> | null }
   | { type: "CAPTION_SELECTION_SET"; captionId: string | null };
@@ -184,12 +184,13 @@ const initialState: EditorState = {
 function sameLeaseIdentity(current: EditLease | null, next: EditLease | null): boolean {
   if (current === next) return true;
   if (!current || !next) return false;
-  // expiresAt may move forward on each heartbeat, but the UI only cares whether
-  // the active lease/owner changed. Avoid rerendering the whole editor per poll.
+  // Unchanged polls do not rerender the editor. A renewal must update the
+  // deadline displayed by the handoff notice.
   return (
     current.projectId === next.projectId &&
     current.leaseId === next.leaseId &&
-    current.owner === next.owner
+    current.owner === next.owner && current.expiresAt === next.expiresAt &&
+    current.acquiredAt === next.acquiredAt
   );
 }
 
@@ -315,6 +316,7 @@ function reducer(state: EditorState, action: EditorAction): EditorState {
     case "TEMPLATE_OPEN_SET":
       return { ...state, templateOpen: action.open };
     case "EDIT_LOCK_SET":
+      if (action.projectId !== state.currentId) return state;
       if (sameLeaseIdentity(state.editLock, action.lease)) return state;
       return {
         ...state,
