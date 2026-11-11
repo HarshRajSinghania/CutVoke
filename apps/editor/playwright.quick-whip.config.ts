@@ -2,7 +2,9 @@ import { defineConfig } from '@playwright/test';
 import { resolve } from 'node:path';
 import base from './playwright.config';
 
-export default defineConfig(base, {
+// Merge by object spread: defineConfig(base, overrides) concatenates web servers.
+export default defineConfig({
+  ...base,
   testDir: './qa',
   testMatch: 'quick-whip.spec.ts',
   webServer: {
