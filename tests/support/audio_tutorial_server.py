@@ -14,6 +14,7 @@ with tempfile.TemporaryDirectory(prefix='cutvoke-audio-tutorial-') as temporary:
     output = Path(temporary) / 'tutorial'
     module.run(output)
     raise SystemExit(subprocess.call([sys.executable, '-m', 'cutvoke', 'serve', '--host', '127.0.0.1',
-        '--port', os.environ.get('CUTVOKE_AUDIO_TUTORIAL_PORT', '8807'), '--data', str(output / 'data')],
+        '--port', os.environ.get('CUTVOKE_AUDIO_TUTORIAL_PORT', '8807'), '--data',
+        str(output / 'roundtrip/projects.sqlite' if os.environ.get('CUTVOKE_AUDIO_TUTORIAL_RESTORED') == '1' else output / 'data')],
         env={**os.environ, 'CUTVOKE_EXTENSION_HOME': str(output / 'extensions'),
              'CUTVOKE_FONT_CACHE': str(output / 'font-cache'), 'PYTHONIOENCODING': 'utf-8'}))
